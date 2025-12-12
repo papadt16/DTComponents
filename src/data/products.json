@@ -1,0 +1,56 @@
+[
+  {
+    "id": "p1",
+    "title": "ESP32 Dev Board",
+    "sku": "ESP32-DEV",
+    "price": 4500,
+    "category": "Microcontrollers",
+    "img": "https://i.imgur.com/4YbqJ7v.png",
+    "stock": 12
+  },
+  {
+    "id": "p2",
+    "title": "Arduino Uno R3",
+    "sku": "ARDUINO-UNO",
+    "price": 3200,
+    "category": "Microcontrollers",
+    "img": "https://i.imgur.com/7b4bG3R.png",
+    "stock": 8
+  },
+  {
+    "id": "p3",
+    "title": "Breadboard 830 Points",
+    "sku": "BB-830",
+    "price": 700,
+    "category": "Prototyping",
+    "img": "https://i.imgur.com/t6KQz1s.png",
+    "stock": 30
+  },
+  {
+    "id": "p4",
+    "title": "Jumper Wires (40pcs)",
+    "sku": "JUMP-40",
+    "price": 400,
+    "category": "Prototyping",
+    "img": "https://i.imgur.com/6a7GZ1x.png",
+    "stock": 50
+  },
+  {
+    "id": "p5",
+    "title": "DHT11 Temperature Sensor",
+    "sku": "DHT11",
+    "price": 250,
+    "category": "Sensors",
+    "img": "https://i.imgur.com/Pl8XvWf.png",
+    "stock": 40
+  },
+  {
+    "id": "p6",
+    "title": "SG90 Micro Servo",
+    "sku": "SG90",
+    "price": 800,
+    "category": "Actuators",
+    "img": "https://i.imgur.com/5q2Xn0K.png",
+    "stock": 20
+  }
+]
