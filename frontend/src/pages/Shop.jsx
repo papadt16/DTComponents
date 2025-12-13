@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import axios from "axios";
 
-const API = "https://YOUR_BACKEND_URL_HERE";
+const API = "https://dtcomponents-backend.onrender.com";
 
 export default function Shop() {
   const [products, setProducts] = useState([]);
@@ -97,3 +97,4 @@ const btn = {
   color: "white",
   border: "none",
 };
+
