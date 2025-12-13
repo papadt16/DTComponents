@@ -1,7 +1,7 @@
 import { useState } from "react";
 import axios from "axios";
 
-const API = "https://YOUR_BACKEND_URL_HERE";
+const API = "https://dtcomponents-backend.onrender.com";
 
 export default function AdminPage() {
   const [token, setToken] = useState(localStorage.getItem("dt_token") || "");
@@ -123,3 +123,4 @@ export default function AdminPage() {
     </div>
   );
 }
+
