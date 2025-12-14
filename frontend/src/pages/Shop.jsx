@@ -9,169 +9,112 @@ export default function Shop() {
   const [searchParams] = useSearchParams();
   const [search, setSearch] = useState(searchParams.get("search") || "");
   const [category, setCategory] = useState("All");
-  const [hasSearched, setHasSearched] = useState(false);
-
-  async function loadProducts() {
-    if (!search.trim()) {
-      setProducts([]);
-      return;
-    }
-
-    const res = await axios.get(`${API}/products`, {
-      params: { search, category },
-    });
-    setProducts(res.data);
-    setHasSearched(true);
-  }
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    loadProducts();
+    const delay = setTimeout(() => {
+      loadProducts();
+    }, 400); // debounce search
+
+    return () => clearTimeout(delay);
   }, [search, category]);
 
-  return (
-    <div>
-      {/* HERO SECTION */}
-      <div style={hero}>
-        <img
-          src="https://rossum.ai/wp-content/uploads/2024/05/technology-2.jpg"
-          alt="Electronics"
-          style={heroImg}
-        />
-        <div style={heroOverlay}>
-          <h1 style={heroTitle}>DTComponents</h1>
-          <p style={heroText}>
-            Find electronics components, modules & ICs instantly
-          </p>
+  async function loadProducts() {
+    try {
+      setLoading(true);
 
-          <input
-            placeholder="Search components, modules, ICs..."
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            style={heroInput}
-          />
-        </div>
+      const params = {};
+      if (search.trim() !== "") params.search = search.trim();
+      if (category !== "All") params.category = category;
+
+      const res = await axios.get(`${API}/products`, { params });
+      setProducts(res.data);
+    } catch (err) {
+      console.error("Failed to load products", err);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  return (
+    <div style={{ padding: "30px" }}>
+      <h2>Shop Components</h2>
+
+      <div style={filterBar}>
+        <input
+          placeholder="Search components..."
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          style={input}
+        />
+
+        <select value={category} onChange={(e) => setCategory(e.target.value)}>
+          <option value="All">All</option>
+          <option value="Microcontrollers">Microcontrollers</option>
+          <option value="Sensors">Sensors</option>
+          <option value="ICs">ICs</option>
+          <option value="Resistors">Resistors</option>
+          <option value="Capacitors">Capacitors</option>
+          <option value="Modules">Modules</option>
+          <option value="Tools">Tools</option>
+        </select>
       </div>
 
-      {/* FILTERS + PRODUCTS (ONLY AFTER SEARCH) */}
-      {hasSearched && (
-        <div style={{ padding: "30px" }}>
-          <div style={filterBar}>
-            <select
-              value={category}
-              onChange={(e) => setCategory(e.target.value)}
-            >
-              <option>All</option>
-              <option>Microcontrollers</option>
-              <option>Development Boards</option>
-              <option>Sensors</option>
-              <option>Modules</option>
-              <option>Integrated Circuits (ICs)</option>
-              <option>Power Components</option>
-              <option>Prototyping</option>
-              <option>Tools & Accessories</option>
-            </select>
-          </div>
+      {loading && <p>Searching components...</p>}
 
-          <div style={grid}>
-            {products.map((p) => (
-              <div key={p._id} style={card}>
-                <img src={p.img} alt={p.title} style={image} />
-                <h4>{p.title}</h4>
-                <small>{p.sku}</small>
-                <p>₦{p.price}</p>
-                <button style={btn}>Add to Cart</button>
-              </div>
-            ))}
+      <div style={grid}>
+        {products.map((p) => (
+          <div key={p._id} style={card}>
+            <img src={p.img} alt={p.title} style={image} />
+            <h4>{p.title}</h4>
+            <small>{p.sku}</small>
+            <p>₦{p.price}</p>
+            <button style={btn}>Add to Cart</button>
           </div>
+        ))}
 
-          {products.length === 0 && (
-            <p style={{ marginTop: "20px", color: "#555" }}>
-              No products found. Try another search.
-            </p>
-          )}
-        </div>
-      )}
+        {!loading && products.length === 0 && (
+          <p>No components found.</p>
+        )}
+      </div>
     </div>
   );
 }
 
-/* ================= STYLES ================= */
-
-const hero = {
-  position: "relative",
-  height: "65vh",
-  overflow: "hidden",
-};
-
-const heroImg = {
-  width: "100%",
-  height: "100%",
-  objectFit: "cover",
-  filter: "brightness(40%)",
-};
-
-const heroOverlay = {
-  position: "absolute",
-  inset: 0,
-  display: "flex",
-  flexDirection: "column",
-  alignItems: "center",
-  justifyContent: "center",
-  color: "white",
-  textAlign: "center",
-  padding: "20px",
-};
-
-const heroTitle = {
-  fontSize: "42px",
-  fontWeight: "bold",
-};
-
-const heroText = {
-  marginTop: "10px",
-  fontSize: "18px",
-};
-
-const heroInput = {
-  marginTop: "25px",
-  padding: "14px",
-  width: "100%",
-  maxWidth: "500px",
-  fontSize: "16px",
-  borderRadius: "6px",
-  border: "none",
-};
-
 const filterBar = {
-  marginBottom: "20px",
+  display: "flex",
+  gap: "10px",
+  margin: "20px 0",
+};
+
+const input = {
+  padding: "10px",
+  flex: 1,
 };
 
 const grid = {
   display: "grid",
-  gridTemplateColumns: "repeat(auto-fill, minmax(220px, 1fr))",
+  gridTemplateColumns: "repeat(auto-fill, minmax(200px, 1fr))",
   gap: "20px",
 };
 
 const card = {
   border: "1px solid #ddd",
   padding: "15px",
-  borderRadius: "8px",
-  background: "white",
+  borderRadius: "6px",
 };
 
 const image = {
   width: "100%",
-  height: "160px",
+  height: "140px",
   objectFit: "contain",
 };
 
 const btn = {
   marginTop: "10px",
   width: "100%",
-  padding: "10px",
+  padding: "8px",
   background: "#0ea5e9",
   color: "white",
   border: "none",
-  borderRadius: "4px",
 };
-
