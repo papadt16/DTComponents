@@ -33,7 +33,7 @@ export default function Shop() {
       {/* HERO SECTION */}
       <div style={hero}>
         <img
-          src="https://images.unsplash.com/photo-1581090700227-1e37b190418e"
+          src="https://rossum.ai/wp-content/uploads/2024/05/technology-2.jpg"
           alt="Electronics"
           style={heroImg}
         />
@@ -174,3 +174,4 @@ const btn = {
   border: "none",
   borderRadius: "4px",
 };
+
