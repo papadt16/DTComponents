@@ -12,7 +12,7 @@ export default function App() {
         <div>
           <Link to="/shop" style={linkStyle}>Shop</Link>
           <Link to="/cart" style={linkStyle}>Cart</Link>
-          <Link to="/admin" style={linkStyle}>Admin</Link>
+          {/* ❌ Admin link REMOVED */}
         </div>
       </nav>
 
@@ -20,11 +20,25 @@ export default function App() {
         <Route path="/" element={<Home />} />
         <Route path="/shop" element={<Shop />} />
         <Route path="/cart" element={<CartPage />} />
-        <Route path="/admin" element={<AdminPage />} />
+        <Route path="/admin" element={<ProtectedAdmin />} />
       </Routes>
     </>
   );
 }
+
+/* ===== ADMIN PROTECTION ===== */
+function ProtectedAdmin() {
+  const pass = prompt("Admin access only");
+
+  if (pass !== "Emmanuel1234$") {
+    window.location.href = "/";
+    return null;
+  }
+
+  return <AdminPage />;
+}
+
+/* ===== STYLES ===== */
 
 const navStyle = {
   padding: "15px 30px",
@@ -32,18 +46,18 @@ const navStyle = {
   justifyContent: "space-between",
   alignItems: "center",
   background: "#0f172a",
-  color: "white"
+  color: "white",
 };
 
 const logoStyle = {
   fontWeight: "bold",
   fontSize: "20px",
   color: "white",
-  textDecoration: "none"
+  textDecoration: "none",
 };
 
 const linkStyle = {
   marginLeft: "20px",
   color: "white",
-  textDecoration: "none"
+  textDecoration: "none",
 };
