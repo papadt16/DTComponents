@@ -16,10 +16,17 @@ export default function AdminPage() {
   });
 
   async function handleLogin() {
+  try {
     const res = await axios.post(`${API}/admin/login`, login);
     localStorage.setItem("dt_token", res.data.token);
     setToken(res.data.token);
+  } catch (err) {
+    alert(
+      err.response?.data?.message ||
+      "Login failed. Check username/password."
+    );
   }
+}
 
   async function uploadImage(file) {
     const form = new FormData();
@@ -123,4 +130,5 @@ export default function AdminPage() {
     </div>
   );
 }
+
 
