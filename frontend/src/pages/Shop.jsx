@@ -1,11 +1,12 @@
 import { useEffect, useState } from "react";
-import { useSearchParams } from "react-router-dom";
+import { useSearchParams, useNavigate } from "react-router-dom";
 import axios from "axios";
 
 const API = "https://dtcomponents-backend.onrender.com";
 
 export default function Shop() {
   const [products, setProducts] = useState([]);
+  const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const [search, setSearch] = useState(searchParams.get("search") || "");
   const [category, setCategory] = useState("All");
@@ -79,10 +80,11 @@ export default function Shop() {
       </div>
 
       <div style={grid}>
-        {products.map((p) => (
-          <div
-            key={p._id}
-            style={card}
+       {products.map((p) => (
+           <div
+           key={p._id}
+           style={card}
+           onClick={() => navigate(`/product/${p._id}`)}
             onMouseEnter={(e) => (e.currentTarget.style.transform = "translateY(-5px)")}
             onMouseLeave={(e) => (e.currentTarget.style.transform = "translateY(0)")}
           >
@@ -98,8 +100,14 @@ export default function Shop() {
 
             <p style={price}>₦{p.price}</p>
 
-            <button style={btn} onClick={() => addToCart(p)}>
-              Add to Cart
+            <button
+             style={btn}
+             onClick={(e) => {
+             e.stopPropagation();
+             addToCart(p);
+             }}
+             >
+             Add to Cart
             </button>
           </div>
         ))}
@@ -199,3 +207,4 @@ const toastStyle = {
   borderRadius: "6px",
   boxShadow: "0 4px 12px rgba(0,0,0,0.2)",
 };
+
