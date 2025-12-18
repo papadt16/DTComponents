@@ -143,6 +143,24 @@ app.put("/products/:id", requireAdmin, async (req, res) => {
 });
 
 // ---------------------------
+// GET SINGLE PRODUCT
+// ---------------------------
+app.get("/products/:id", async (req, res) => {
+  const { id } = req.params;
+  if (!mongoose.Types.ObjectId.isValid(id)) {
+    return res.status(400).json({ message: "Invalid product ID" });
+  }
+
+  try {
+    const product = await Product.findById(id);
+    if (!product) return res.status(404).json({ message: "Product not found" });
+    res.json(product);
+  } catch (err) {
+    res.status(500).json({ message: "Server error" });
+  }
+});
+
+// ---------------------------
 // DELETE PRODUCT
 // ---------------------------
 app.delete("/products/:id", requireAdmin, async (req, res) => {
@@ -193,3 +211,4 @@ app.post("/products/import", requireAdmin, upload.single("file"), async (req, re
 // START SERVER
 // ---------------------------
 app.listen(PORT, () => console.log(`Backend running on port ${PORT}`));
+
