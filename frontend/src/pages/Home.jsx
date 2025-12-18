@@ -48,7 +48,7 @@ const overlay = {
   flexDirection: "column",
   alignItems: "center",
   justifyContent: "center",
-  color: "black",
+  color: "white",
   textAlign: "center",
   padding: "20px",
 };
@@ -87,6 +87,7 @@ const button = {
   cursor: "pointer",
   fontWeight: "bold",
 };
+
 
 
 
