@@ -50,7 +50,7 @@ const ProductSchema = new mongoose.Schema({
   description: String,
 });
 
-const Product = mongoose.model("Product", ProductSchema);
+const Product = mongoose.model("Product", ProductSchema, "dtcomponents");
 
 // ---------------------------
 // ADMIN (single user account)
@@ -211,4 +211,5 @@ app.post("/products/import", requireAdmin, upload.single("file"), async (req, re
 // START SERVER
 // ---------------------------
 app.listen(PORT, () => console.log(`Backend running on port ${PORT}`));
+
 
