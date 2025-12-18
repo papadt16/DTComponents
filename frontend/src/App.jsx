@@ -12,6 +12,7 @@ export default function App() {
       <nav style={navStyle}>
         <Link to="/" style={logoStyle}>DTComponents</Link>
         <div>
+          <Link to="/" style={linkStyle}>Home</Link>
           <Link to="/shop" style={linkStyle}>Shop</Link>
           <Link to="/cart" style={linkStyle}>Cart</Link>
           {/* ❌ Admin link REMOVED */}
@@ -64,4 +65,5 @@ const linkStyle = {
   color: "white",
   textDecoration: "none",
 };
+
 
