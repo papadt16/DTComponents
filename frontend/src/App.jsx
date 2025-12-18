@@ -3,6 +3,8 @@ import Home from "./pages/Home.jsx";
 import Shop from "./pages/Shop.jsx";
 import CartPage from "./pages/CartPage.jsx";
 import AdminPage from "./pages/AdminPage.jsx";
+import ProductDetails from "./pages/ProductDetails.jsx";
+
 
 export default function App() {
   return (
@@ -19,6 +21,7 @@ export default function App() {
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/shop" element={<Shop />} />
+        <Route path="/product/:id" element={<ProductDetails />} />
         <Route path="/cart" element={<CartPage />} />
         <Route path="/admin" element={<ProtectedAdmin />} />
       </Routes>
@@ -61,3 +64,4 @@ const linkStyle = {
   color: "white",
   textDecoration: "none",
 };
+
