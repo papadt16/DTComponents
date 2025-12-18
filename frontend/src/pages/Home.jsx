@@ -34,7 +34,7 @@ export default function Home() {
 const container = {
   height: "90vh",
   backgroundImage:
-    "url(https://tse4.mm.bing.net/th/id/OIP.EHOLYXoyHJU9kehqVJBJ9QHaEO?cb=ucfimg2&pid=ImgDet&ucfimg=1&w=199&h=113&c=7&dpr=1.5&o=7&rm=3)",
+    "url(https://plus.unsplash.com/premium_photo-1683120972279-87efe2ba252f?w=356&dpr=2&h=540&auto=format&fit=crop&q=60&ixid=M3wxMjA3fDB8MXxzZWFyY2h8MTd8fGNpcmN1aXQlMjBib2FyZHxlbnwwfHx8fDE3NjYwMTY5NTN8MA&ixlib=rb-4.1.0)",
   backgroundSize: "cover",
   backgroundPosition: "center",
   position: "relative",
@@ -87,5 +87,6 @@ const button = {
   cursor: "pointer",
   fontWeight: "bold",
 };
+
 
 
