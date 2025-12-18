@@ -47,7 +47,16 @@ const ProductSchema = new mongoose.Schema({
   category: String,
   price: Number,
   img: String,
-  description: String,
+
+  description: {
+    overview: String,
+    features: [String],
+    applications: [String],
+    specifications: {
+      type: Map,
+      of: String,
+    },
+  },
 });
 
 const Product = mongoose.model("Product", ProductSchema, "products");
@@ -211,6 +220,7 @@ app.post("/products/import", requireAdmin, upload.single("file"), async (req, re
 // START SERVER
 // ---------------------------
 app.listen(PORT, () => console.log(`Backend running on port ${PORT}`));
+
 
 
 
