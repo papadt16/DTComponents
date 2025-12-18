@@ -47,28 +47,70 @@ export default function CartPage() {
 
   const total = () => cart.reduce((s, p) => s + p.price * p.qty, 0);
 
-  const generatePDF = () => {
-    const doc = new jsPDF();
-    doc.text("DTComponents Order Receipt", 10, 10);
+const generatePdfAndSendWhatsApp = () => {
+  const doc = new jsPDF();
 
-    let y = 20;
-    cart.forEach((p) => {
-      doc.text(`${p.qty} x ${p.title} - ₦${p.qty * p.price}`, 10, y);
-      y += 10;
-    });
+  // Header
+  doc.setFontSize(16);
+  doc.text("DTComponents", 105, 15, { align: "center" });
 
-    doc.text(`Total: ₦${total()}`, 10, y + 10);
-    doc.save("DTComponents_Order.pdf");
-  };
+  doc.setFontSize(11);
+  doc.text("Bill of Quantities (BOQ)", 105, 22, { align: "center" });
 
-  const sendWhatsApp = () => {
-    let msg = "DTComponents Order%0A";
-    cart.forEach((p) => {
-      msg += `${p.qty} x ${p.title} = ₦${p.qty * p.price}%0A`;
-    });
-    msg += `Total: ₦${total()}`;
+  doc.setFontSize(10);
+  doc.text(`Date: ${new Date().toLocaleDateString()}`, 14, 30);
 
-    window.open(`https://wa.me/${WHATSAPP_NUMBER}?text=${msg}`);
+  // Table header
+  let y = 40;
+  doc.setFontSize(10);
+  doc.text("S/N", 14, y);
+  doc.text("Description", 25, y);
+  doc.text("Qty", 130, y);
+  doc.text("Unit (₦)", 145, y);
+  doc.text("Amount (₦)", 170, y);
+
+  y += 6;
+  doc.line(14, y, 195, y);
+  y += 6;
+
+  // Table rows
+  cart.forEach((item, index) => {
+    doc.text(String(index + 1), 14, y);
+    doc.text(item.title, 25, y);
+    doc.text(String(item.qty), 130, y);
+    doc.text(item.price.toLocaleString(), 145, y);
+    doc.text((item.qty * item.price).toLocaleString(), 170, y);
+    y += 7;
+  });
+
+  y += 4;
+  doc.line(14, y, 195, y);
+  y += 8;
+
+  // Total
+  doc.setFontSize(11);
+  doc.text(
+    `Grand Total: ₦${total().toLocaleString()}`,
+    195,
+    y,
+    { align: "right" }
+  );
+
+  // Save PDF
+  const fileName = "DTComponents_BOQ.pdf";
+  doc.save(fileName);
+
+  // WhatsApp message
+  let msg =
+    "Hello DTComponents,%0A%0APlease find my BOQ attached.%0A%0AOrder Summary:%0A";
+
+  cart.forEach((p) => {
+    msg += `- ${p.qty} x ${p.title}%0A`;
+  });
+
+  msg += `%0AGrand Total: ₦${total().toLocaleString()}%0A%0AThank you.`;
+
+  window.open(`https://wa.me/${WHATSAPP_NUMBER}?text=${msg}`, "_blank");
   };
 
   if (!cart.length) return <h2 style={{ padding: 30 }}>Your cart is empty</h2>;
@@ -97,10 +139,21 @@ export default function CartPage() {
 
       <h3>Total: ₦{total()}</h3>
 
-      <button onClick={generatePDF}>Generate PDF</button>
-      <button onClick={sendWhatsApp} style={{ marginLeft: "10px" }}>
-        Send to WhatsApp
-      </button>
+     <button
+      onClick={generatePdfAndSendWhatsApp}
+      style={{
+      padding: "12px 20px",
+      background: "#16a34a",
+      color: "white",
+      border: "none",
+      borderRadius: 8,
+      fontSize: 16,
+      cursor: "pointer",
+      }}
+      >
+     Generate BOQ PDF & Send to WhatsApp
+    </button>
+
     </div>
   );
 }
@@ -136,3 +189,4 @@ const removeBtn = {
   borderRadius: 6,
   cursor: "pointer",
 };
+
