@@ -15,6 +15,10 @@ export default function AdminPage() {
     description: "",
     img: "",
   });
+  
+useEffect(() => {
+  if (token) loadProducts(); // load products immediately if logged in
+}, [token]);
 
   // ------------------------------
   // LOGIN
@@ -275,3 +279,4 @@ export default function AdminPage() {
     </div>
   );
 }
+
