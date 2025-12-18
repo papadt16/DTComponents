@@ -9,31 +9,38 @@ export default function Shop() {
   const [searchParams] = useSearchParams();
   const [search, setSearch] = useState(searchParams.get("search") || "");
   const [category, setCategory] = useState("All");
-  const [loading, setLoading] = useState(false);
-
-  useEffect(() => {
-    const delay = setTimeout(() => {
-      loadProducts();
-    }, 400); // debounce search
-
-    return () => clearTimeout(delay);
-  }, [search, category]);
 
   async function loadProducts() {
-    try {
-      setLoading(true);
+    const res = await axios.get(`${API}/products`, {
+      params: { search, category },
+    });
+    setProducts(res.data);
+  }
 
-      const params = {};
-      if (search.trim() !== "") params.search = search.trim();
-      if (category !== "All") params.category = category;
+  useEffect(() => {
+    loadProducts();
+  }, [search, category]);
 
-      const res = await axios.get(`${API}/products`, { params });
-      setProducts(res.data);
-    } catch (err) {
-      console.error("Failed to load products", err);
-    } finally {
-      setLoading(false);
+  // ✅ ADD TO CART LOGIC
+  function addToCart(product) {
+    const cart = JSON.parse(localStorage.getItem("dt_cart")) || [];
+
+    const existing = cart.find((item) => item._id === product._id);
+
+    if (existing) {
+      existing.qty += 1;
+    } else {
+      cart.push({
+        _id: product._id,
+        title: product.title,
+        price: product.price,
+        img: product.img,
+        qty: 1,
+      });
     }
+
+    localStorage.setItem("dt_cart", JSON.stringify(cart));
+    alert(`${product.title} added to cart`);
   }
 
   return (
@@ -49,18 +56,21 @@ export default function Shop() {
         />
 
         <select value={category} onChange={(e) => setCategory(e.target.value)}>
-          <option value="All">All</option>
-          <option value="Microcontrollers">Microcontrollers</option>
-          <option value="Sensors">Sensors</option>
-          <option value="ICs">ICs</option>
-          <option value="Resistors">Resistors</option>
-          <option value="Capacitors">Capacitors</option>
-          <option value="Modules">Modules</option>
-          <option value="Tools">Tools</option>
+          <option>All</option>
+          <option>Microcontrollers</option>
+          <option>Sensors</option>
+          <option>ICs</option>
+          <option>Resistors</option>
+          <option>Capacitors</option>
+          <option>Modules</option>
+          <option>Tools</option>
+          <option>Displays</option>
+          <option>Switches</option>
+          <option>Transistors</option>
+          <option>Diodes</option>
+          <option>Connectors</option>
         </select>
       </div>
-
-      {loading && <p>Searching components...</p>}
 
       <div style={grid}>
         {products.map((p) => (
@@ -68,14 +78,13 @@ export default function Shop() {
             <img src={p.img} alt={p.title} style={image} />
             <h4>{p.title}</h4>
             <small>{p.sku}</small>
-            <p>₦{p.price}</p>
-            <button style={btn}>Add to Cart</button>
+            <p><b>₦{p.price}</b></p>
+
+            <button style={btn} onClick={() => addToCart(p)}>
+              Add to Cart
+            </button>
           </div>
         ))}
-
-        {!loading && products.length === 0 && (
-          <p>No components found.</p>
-        )}
       </div>
     </div>
   );
@@ -117,4 +126,5 @@ const btn = {
   background: "#0ea5e9",
   color: "white",
   border: "none",
+  cursor: "pointer",
 };
