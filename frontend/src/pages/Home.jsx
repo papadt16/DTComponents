@@ -32,7 +32,7 @@ export default function Home() {
 }
 
 const container = {
-  height: "100vh",
+  height: "90vh",
   backgroundImage:
     "url(https://plus.unsplash.com/premium_photo-1683120972279-87efe2ba252f?w=356&dpr=2&h=540&auto=format&fit=crop&q=60&ixid=M3wxMjA3fDB8MXxzZWFyY2h8MTd8fGNpcmN1aXQlMjBib2FyZHxlbnwwfHx8fDE3NjYwMTY5NTN8MA&ixlib=rb-4.1.0)",
   backgroundSize: "cover",
@@ -87,6 +87,7 @@ const button = {
   cursor: "pointer",
   fontWeight: "bold",
 };
+
 
 
 
