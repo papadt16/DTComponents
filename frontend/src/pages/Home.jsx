@@ -65,28 +65,28 @@ const projects = [
     title: "Smart Home Automation",
     description:
       "Control lights and appliances remotely using ESP32 and relays.",
-    image: "https://images.unsplash.com/photo-1581090700227-1e37b190418e",
+    image: "https://content.instructables.com/FQT/SEJB/KJEAG18Z/FQTSEJBKJEAG18Z.jpg?auto=webp&frame=1&crop=3:2&width=900&height=1024&fit=bounds&md=MjAyMS0wMS0wMSAyMDowNDo0OC4w",
   },
   {
     slug: "iot-weather-station",
     title: "IoT Weather Station",
     description:
       "Monitor temperature, humidity and pressure with live cloud updates.",
-    image: "https://images.unsplash.com/photo-1509395176047-4a66953fd231",
+    image: "https://th.bing.com/th/id/OIP.iPOBJH26k9zEPDEbN11jLAHaEL?w=315&h=180&c=7&r=0&o=7&cb=ucfimg2&dpr=1.5&pid=1.7&rm=3&ucfimg=1",
   },
   {
-    slug: "rfid-attendance-system",
-    title: "RFID Attendance System",
+    slug: "line-following-robot",
+    title: "Line Following Robot",
     description:
-      "Automated student/staff attendance tracking using RFID and Arduino.",
-    image: "https://images.unsplash.com/photo-1581092160562-40aa08e78837",
+      "A robust prototype capable of autonomously following complex line paths with high accuracy and consistency.",
+    image: "https://th.bing.com/th/id/OIP.bz3FN8l2mJcXddudyt8MOQHaE8?w=239&h=180&c=7&r=0&o=7&cb=ucfimg2&dpr=1.5&pid=1.7&rm=3&ucfimg=1",
   },
   {
     slug: "smart-queue-system",
     title: "Smart Queue Management",
     description:
       "Token-based customer queue system with display and buzzer alerts.",
-    image: "https://images.unsplash.com/photo-1581090700227-1e37b190418e",
+    image: "https://microcontrollerslab.com/wp-content/uploads/2020/04/FreeRTOS-queue-example-with-LCD-and-ADC-circuit-diagram.jpg",
   },
 ];
 
@@ -210,3 +210,4 @@ const projectBtn = {
   borderRadius: "6px",
   cursor: "pointer",
 };
+
