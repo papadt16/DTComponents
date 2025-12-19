@@ -37,7 +37,11 @@ export default function ProductDetails() {
 
   if (!product) return <p style={{ padding: 40 }}>Loading...</p>;
 
-  const d = product.description || {};
+  // 🔑 NORMALIZE DESCRIPTION (string + structured JSON support)
+  const d =
+    typeof product.description === "string"
+      ? { overview: product.description }
+      : product.description || {};
 
   return (
     <div style={page}>
@@ -62,35 +66,35 @@ export default function ProductDetails() {
       </div>
 
       {/* DESCRIPTION SECTION */}
-      {d && (
-        <div style={descContainer}>
-          {d.overview && (
-            <Section title="Overview">
-              <p>{d.overview}</p>
-            </Section>
-          )}
+      <div style={descContainer}>
+        {d.overview && (
+          <Section title="Overview">
+            <p>{d.overview}</p>
+          </Section>
+        )}
 
-          {d.features?.length > 0 && (
-            <Section title="Features">
-              <ul>
-                {d.features.map((f, i) => (
-                  <li key={i}>{f}</li>
-                ))}
-              </ul>
-            </Section>
-          )}
+        {d.features?.length > 0 && (
+          <Section title="Features">
+            <ul>
+              {d.features.map((f, i) => (
+                <li key={i}>{f}</li>
+              ))}
+            </ul>
+          </Section>
+        )}
 
-          {d.applications?.length > 0 && (
-            <Section title="Applications">
-              <ul>
-                {d.applications.map((a, i) => (
-                  <li key={i}>{a}</li>
-                ))}
-              </ul>
-            </Section>
-          )}
+        {d.applications?.length > 0 && (
+          <Section title="Applications">
+            <ul>
+              {d.applications.map((a, i) => (
+                <li key={i}>{a}</li>
+              ))}
+            </ul>
+          </Section>
+        )}
 
-          {d.specifications && (
+        {d.specifications &&
+          Object.keys(d.specifications).length > 0 && (
             <Section title="Specifications">
               <table style={specTable}>
                 <tbody>
@@ -104,8 +108,7 @@ export default function ProductDetails() {
               </table>
             </Section>
           )}
-        </div>
-      )}
+      </div>
     </div>
   );
 }
