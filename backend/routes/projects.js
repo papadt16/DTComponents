@@ -39,4 +39,4 @@ router.delete("/:id", auth, async (req, res) => {
   res.json({ success: true });
 });
 
-module.exports = router;
+export default router;
