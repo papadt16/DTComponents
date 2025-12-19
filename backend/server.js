@@ -10,6 +10,7 @@ import bcrypt from "bcrypt";
 import csv from "csvtojson";
 import streamifier from "streamifier";
 import cloudinary from "cloudinary";
+import projectsRoutes from "./routes/projects.js"; // include .js extension
 
 // ---------------------------
 // CONFIG
@@ -216,12 +217,14 @@ app.post("/products/import", requireAdmin, upload.single("file"), async (req, re
   }
 });
 
-app.use("/projects", require("./routes/projects"));
+app.use("/projects", projectsRoutes);
+
 
 // ---------------------------
 // START SERVER
 // ---------------------------
 app.listen(PORT, () => console.log(`Backend running on port ${PORT}`));
+
 
 
 
