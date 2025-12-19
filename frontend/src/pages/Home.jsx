@@ -78,7 +78,7 @@ const projects = [
     slug: "line-following-robot",
     title: "Line Following Robot",
     description:
-      "A robust prototype capable of autonomously following complex line paths with high accuracy and consistency.",
+      "A prototype capable of autonomously following complex line paths.",
     image: "https://th.bing.com/th/id/OIP.bz3FN8l2mJcXddudyt8MOQHaE8?w=239&h=180&c=7&r=0&o=7&cb=ucfimg2&dpr=1.5&pid=1.7&rm=3&ucfimg=1",
   },
   {
@@ -210,4 +210,5 @@ const projectBtn = {
   borderRadius: "6px",
   cursor: "pointer",
 };
+
 
