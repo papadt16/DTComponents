@@ -70,7 +70,7 @@ export default function ProjectDetails() {
     </div>
   );
 }
-
+ 
 const projects = {
   "smart-home-automation": {
     title: "Smart Home Automation",
