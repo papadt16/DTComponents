@@ -3,6 +3,7 @@ import Home from "./pages/Home.jsx";
 import Shop from "./pages/Shop.jsx";
 import CartPage from "./pages/CartPage.jsx";
 import AdminPage from "./pages/AdminPage.jsx";
+import AdminProjects from "./pages/AdminProjects.jsx";
 import ProjectDetails from "./pages/ProjectDetails";
 import ProductDetails from "./pages/ProductDetails.jsx";
 
@@ -26,6 +27,7 @@ export default function App() {
         <Route path="/product/:id" element={<ProductDetails />} />
         <Route path="/cart" element={<CartPage />} />
         <Route path="/projects/:slug" element={<ProjectDetails />} />
+        <Route path="/admin/projects" element={<AdminProjects />} />
         <Route path="/admin" element={<ProtectedAdmin />} />
       </Routes>
     </>
@@ -67,6 +69,7 @@ const linkStyle = {
   color: "white",
   textDecoration: "none",
 };
+
 
 
 
