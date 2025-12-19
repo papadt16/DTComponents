@@ -2,7 +2,13 @@ import { useParams } from "react-router-dom";
 
 export default function ProjectDetails() {
   const { slug } = useParams();
-  const project = projects[slug];
+  const [project, setProject] = useState(null);
+
+useEffect(() => {
+  axios.get(`${API}/projects/${slug}`).then((res) => {
+    setProject(res.data);
+  });
+}, [slug]);
 
   if (!project) {
     return <p style={{ padding: 40 }}>Project not found</p>;
