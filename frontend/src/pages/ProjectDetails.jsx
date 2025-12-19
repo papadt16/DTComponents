@@ -1,62 +1,68 @@
 import { useParams } from "react-router-dom";
 import { useState, useEffect } from "react";
 import axios from "axios";
+import API from "../utils/api";
 
 export default function ProjectDetails() {
   const { slug } = useParams();
   const [project, setProject] = useState(null);
+  const [error, setError] = useState("");
 
-useEffect(() => {
-  axios.get(`${API}/projects/${slug}`).then((res) => {
-    setProject(res.data);
-  });
-}, [slug]);
+  useEffect(() => {
+    axios
+      .get(`${API}/projects/${slug}`)
+      .then((res) => {
+        setProject(res.data);
+      })
+      .catch((err) => {
+        console.error(err);
+        setError("Project not found");
+      });
+  }, [slug]);
+
+  if (error) {
+    return <p style={{ padding: 40 }}>{error}</p>;
+  }
 
   if (!project) {
-    return <p style={{ padding: 40 }}>Project not found</p>;
+    return <p style={{ padding: 40 }}>Loading project...</p>;
   }
 
   return (
     <div style={page}>
       <h1 style={title}>{project.title}</h1>
 
-      {/* OVERVIEW */}
       <Section title="Overview">
         <p>{project.overview}</p>
       </Section>
 
-      {/* FEATURES */}
       <Section title="Key Features">
         <ul>
-          {project.features.map((f, i) => (
+          {project.features?.map((f, i) => (
             <li key={i}>{f}</li>
           ))}
         </ul>
       </Section>
 
-      {/* COMPONENTS */}
       <Section title="Components Required">
         <ul>
-          {project.components.map((c, i) => (
+          {project.components?.map((c, i) => (
             <li key={i}>{c}</li>
           ))}
         </ul>
       </Section>
 
-      {/* SCHEMATIC */}
       <Section title="Schematic Diagram">
         <img src={project.schematic} alt="schematic" style={image} />
       </Section>
 
-      {/* CODE */}
       <Section title="Source Code">
         <pre style={codeBox}>{project.code}</pre>
       </Section>
 
-      {/* EXPLANATION */}
       <Section title="Code Explanation">
         <ol>
-          {project.explanation.map((e, i) => (
+          {project.explanation?.map((e, i) => (
             <li key={i}>{e}</li>
           ))}
         </ol>
