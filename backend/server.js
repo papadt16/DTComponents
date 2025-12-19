@@ -216,10 +216,13 @@ app.post("/products/import", requireAdmin, upload.single("file"), async (req, re
   }
 });
 
+app.use("/projects", require("./routes/projects"));
+
 // ---------------------------
 // START SERVER
 // ---------------------------
 app.listen(PORT, () => console.log(`Backend running on port ${PORT}`));
+
 
 
 
