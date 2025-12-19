@@ -1,30 +1,55 @@
-const express = require("express");
-const router = express.Router();
-const Project = require("../models/Project");
-const auth = require("../middleware/auth");
+import express from "express";
+import mongoose from "mongoose";
 
-// GET all projects
+const router = express.Router();
+
+/* ================================
+   PROJECT SCHEMA
+================================ */
+const ProjectSchema = new mongoose.Schema({
+  title: String,
+  slug: { type: String, unique: true },
+  overview: String,
+  features: [String],
+  components: [String],
+  schematic: String,
+  code: String,
+  explanation: [String],
+});
+
+const Project = mongoose.model("Project", ProjectSchema, "projects");
+
+/* ================================
+   GET ALL PROJECTS
+================================ */
 router.get("/", async (req, res) => {
-  const projects = await Project.find().sort({ createdAt: -1 });
+  const projects = await Project.find();
   res.json(projects);
 });
 
-// GET project by slug
+/* ================================
+   GET PROJECT BY SLUG
+================================ */
 router.get("/:slug", async (req, res) => {
   const project = await Project.findOne({ slug: req.params.slug });
-  if (!project) return res.status(404).json({ error: "Not found" });
+  if (!project) {
+    return res.status(404).json({ message: "Project not found" });
+  }
   res.json(project);
 });
 
-// CREATE project (admin only)
-router.post("/", auth, async (req, res) => {
-  const project = new Project(req.body);
-  await project.save();
+/* ================================
+   CREATE PROJECT
+================================ */
+router.post("/", async (req, res) => {
+  const project = await Project.create(req.body);
   res.json(project);
 });
 
-// UPDATE project
-router.put("/:id", auth, async (req, res) => {
+/* ================================
+   UPDATE PROJECT
+================================ */
+router.put("/:id", async (req, res) => {
   const updated = await Project.findByIdAndUpdate(
     req.params.id,
     req.body,
@@ -33,10 +58,15 @@ router.put("/:id", auth, async (req, res) => {
   res.json(updated);
 });
 
-// DELETE project
-router.delete("/:id", auth, async (req, res) => {
+/* ================================
+   DELETE PROJECT
+================================ */
+router.delete("/:id", async (req, res) => {
   await Project.findByIdAndDelete(req.params.id);
   res.json({ success: true });
 });
 
+/* ================================
+   ✅ REQUIRED FOR ES MODULES
+================================ */
 export default router;
