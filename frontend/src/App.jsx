@@ -26,6 +26,10 @@ export default function App() {
         <Route path="/shop" element={<Shop />} />
         <Route path="/product/:id" element={<ProductDetails />} />
         <Route path="/cart" element={<CartPage />} />
+        <Route
+  path="/orders"
+  element={<OrderHistoryPage loadOrderIntoCart={loadOrderIntoCart} />}
+/>
         <Route path="/projects/:slug" element={<ProjectDetails />} />
         <Route path="/admin/projects" element={<AdminProjects />} />
         <Route path="/admin" element={<ProtectedAdmin />} />
