@@ -15,7 +15,7 @@ export default function Home() {
 
   const handleWhatsAppClick = () => {
     const msg = encodeURIComponent(
-      "Hey DTComponents, I couldn't find the component I was looking for. Please assist me."
+      "Hey DTComponents, I couldn’t find the component I was looking for. The component I need is: [Type component name here]"
     );
     window.open(`https://wa.me/${WHATSAPP_NUMBER}?text=${msg}`, "_blank");
   };
@@ -29,7 +29,7 @@ export default function Home() {
 
           {/* ===== NEW CTA ===== */}
           <p style={ctaText}>
-            Couldn't find a component?{" "}
+            Couldn't find a component/tool?{" "}
             <span style={ctaLink} onClick={handleWhatsAppClick}>
               Click here
             </span>{" "}
