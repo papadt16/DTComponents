@@ -1,10 +1,12 @@
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom"; 
 import jsPDF from "jspdf";
 
 const WHATSAPP_NUMBER = "2349038899075";
 
 export default function CartPage() {
   const [cart, setCart] = useState([]);
+  const navigate = useNavigate(); 
 
   useEffect(() => {
     const storedCart = JSON.parse(localStorage.getItem("dt_cart") || "[]");
@@ -161,7 +163,22 @@ const generatePdfAndSendWhatsApp = () => {
       >
      Generate BOQ PDF & Send to WhatsApp
     </button>
-
+      
+    {/* === ADD ORDER HISTORY BUTTON === */}
+      <button
+        style={{
+          padding: "10px 18px",
+          background: "#2563eb",
+          color: "white",
+          border: "none",
+          borderRadius: 6,
+          cursor: "pointer",
+          marginBottom: 20,
+        }}
+        onClick={() => navigate("/orders")} // navigate to order history page
+      >
+        View Order History
+      </button>
     </div>
   );
 }
