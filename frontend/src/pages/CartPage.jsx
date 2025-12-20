@@ -111,7 +111,7 @@ const generatePdfAndSendWhatsApp = () => {
   msg += `%0AGrand Total: ₦${total().toLocaleString()}%0A%0AThank you.`;
 
   window.open(`https://wa.me/${WHATSAPP_NUMBER}?text=${msg}`, "_blank");
-};
+  };
 
   if (!cart.length) return <h2 style={{ padding: 30 }}>Your cart is empty</h2>;
 
@@ -139,20 +139,20 @@ const generatePdfAndSendWhatsApp = () => {
 
       <h3>Total: ₦{total()}</h3>
 
-      <button
-  onClick={generatePdfAndSendWhatsApp}
-  style={{
-    padding: "12px 20px",
-    background: "#16a34a",
-    color: "white",
-    border: "none",
-    borderRadius: 8,
-    fontSize: 16,
-    cursor: "pointer",
-  }}
->
-  Generate BOQ PDF & Send to WhatsApp
-</button>
+     <button
+      onClick={generatePdfAndSendWhatsApp}
+      style={{
+      padding: "12px 20px",
+      background: "#16a34a",
+      color: "white",
+      border: "none",
+      borderRadius: 8,
+      fontSize: 16,
+      cursor: "pointer",
+      }}
+      >
+     Generate BOQ PDF & Send to WhatsApp
+    </button>
 
     </div>
   );
