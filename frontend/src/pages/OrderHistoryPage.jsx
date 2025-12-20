@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 
-export default function OrderHistoryPage({ loadOrderIntoCart }) {
+export default function OrderHistoryPage() {
   const [orders, setOrders] = useState([]);
   const navigate = useNavigate();
 
@@ -11,13 +11,6 @@ export default function OrderHistoryPage({ loadOrderIntoCart }) {
     );
     setOrders(history);
   }, []);
-
-  const handleLoadOrder = (items) => {
-    // clone items to avoid reference mutation
-    const clonedItems = items.map(item => ({ ...item }));
-    loadOrderIntoCart(clonedItems);
-    navigate("/cart"); // redirect to cart
-  };
 
   if (!orders.length) {
     return <h2 style={{ padding: 30 }}>No previous orders</h2>;
@@ -31,16 +24,27 @@ export default function OrderHistoryPage({ loadOrderIntoCart }) {
         <div key={order.id} style={orderCard}>
           <p><strong>Order ID:</strong> {order.id}</p>
           <p><strong>Date:</strong> {order.date}</p>
-          <p>
-            <strong>Total:</strong> ₦{order.total.toLocaleString()}
-          </p>
+          <p><strong>Total:</strong> ₦{order.total.toLocaleString()}</p>
 
-          <button
-            style={loadBtn}
-            onClick={() => handleLoadOrder(order.items)}
-          >
-            Load Order into Cart
-          </button>
+          <div style={{ display: "flex", gap: "10px" }}>
+            <button
+              style={viewBtn}
+              onClick={() => navigate(`/orders/${order.id}`)}
+            >
+              View Details
+            </button>
+
+            <button
+              style={reorderBtn}
+              onClick={() => {
+                const clonedItems = order.items.map((item) => ({ ...item }));
+                localStorage.setItem("dt_cart", JSON.stringify(clonedItems));
+                navigate("/cart");
+              }}
+            >
+              🔁 Reorder
+            </button>
+          </div>
         </div>
       ))}
     </div>
@@ -57,7 +61,16 @@ const orderCard = {
   background: "#f9fafb",
 };
 
-const loadBtn = {
+const viewBtn = {
+  padding: "8px 16px",
+  background: "#2563eb",
+  color: "white",
+  border: "none",
+  borderRadius: 6,
+  cursor: "pointer",
+};
+
+const reorderBtn = {
   padding: "8px 16px",
   background: "#16a34a",
   color: "white",
