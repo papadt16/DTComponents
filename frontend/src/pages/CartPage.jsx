@@ -124,9 +124,28 @@ export default function CartPage({ cart, updateCart }) {
     updateCart([]);
   };
 
-  if (!cart.length) {
-    return <h2 style={{ padding: 30 }}>Your cart is empty</h2>;
-  }
+ if (!cart.length) {
+  return (
+    <div style={{ padding: 30 }}>
+      <h2>Your cart is empty</h2>
+
+      <button
+        onClick={() => navigate("/orders")}
+        style={{
+          padding: "10px 18px",
+          background: "#2563eb",
+          color: "white",
+          border: "none",
+          borderRadius: 6,
+          cursor: "pointer",
+          marginTop: 20,
+        }}
+      >
+        View Order History
+      </button>
+    </div>
+  );
+}
 
   return (
     <div style={{ padding: 30 }}>
