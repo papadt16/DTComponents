@@ -1,6 +1,8 @@
 import { useParams } from "react-router-dom";
 import { useState, useEffect } from "react";
 import API from "../utils/api";
+import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
+import { oneDark } from "react-syntax-highlighter/dist/esm/styles/prism";
 
 export default function ProjectDetails() {
   const { slug } = useParams();
@@ -53,16 +55,44 @@ useEffect(() => {
       </Section>
 
       <Section title="Source Code">
-        <pre style={codeBox}>{project.code}</pre>
-      </Section>
+  <SyntaxHighlighter
+    language="c"
+    style={oneDark}
+    customStyle={{
+      borderRadius: "8px",
+      fontSize: "14px",
+      padding: "20px",
+    }}
+  >
+    {project.code}
+  </SyntaxHighlighter>
+</Section>
 
-      <Section title="Code Explanation">
-        <ol>
-          {project.explanation?.map((e, i) => (
-            <li key={i}>{e}</li>
-          ))}
-        </ol>
-      </Section>
+
+     <Section title="Code Explanation">
+  <div style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
+    {project.explanation.map((item, i) => (
+      <div key={i}>
+        <p style={{ fontSize: "16px", lineHeight: 1.7 }}>
+          {item.text}
+        </p>
+
+        {item.image && (
+          <img
+            src={item.image}
+            alt="explanation"
+            style={{
+              width: "100%",
+              maxWidth: "500px",
+              marginTop: "15px",
+              borderRadius: "6px",
+            }}
+          />
+        )}
+      </div>
+    ))}
+  </div>
+</Section>
     </div>
   );
 }
@@ -490,42 +520,42 @@ void loop()
 }
 `,
     explanation: [
-      "Step 1: Circuit Diagram of the ESP32 Project",
+      {"Step 1: Circuit Diagram of the ESP32 Project",
       
       "This is the complete circuit diagram for this home automation project. I have explained the circuit in the tutorial video.",
       "The circuit is very simple, I have used the GPIO pins D23, D22, D21, D19, D18, D5, D25 & D26 to control the 8 relays.",
       "And the GPIO pins D13, D12, D14, D27, D33, D32, D15 & D4 connected with push buttons to control the 8 relays manually.",
       "I have used the INPUT_PULLUP function in Arduino IDE instead of using the pull-up resistors.",
       "I have used a 5V mobile charger to supply the smart relay module.",
-
+      },
       
-      "Step 2: Control Relays With Internet Using Blynk",
+      {"Step 2: Control Relays With Internet Using Blynk",
       
       "If the ESP32 module is connected with the WiFi, then you can control the home appliances from Blynk App and push-buttons. You can control, monitor the real-time status of the relays from anywhere in the world with the Blynk App.",
+      },
 
-
-      "Step 3: Control Relays Without Internet Using Push-buttons",
+      {"Step 3: Control Relays Without Internet Using Push-buttons",
 
       "If the WiFi is not available, you can control the relays from the pushbuttons.",
 
       "The ESP32 will check for the WiFi after every 3 seconds. When the WiFi is available, the ESP32 will automatically connect with the WiFi.",
-
+      },
       
-      "Step 4: Configure the Blynk App for the ESP32",
+      {"Step 4: Configure the Blynk App for the ESP32",
       "https://content.instructables.com/FN2/L5IA/KJEAG18W/FN2L5IAKJEAG18W.jpg?auto=webp&frame=1&width=1024&height=1024&fit=bounds&md=MjAyMS0wMS0wMSAyMDowNDo0MS4w&_gl=1*3ddldx*_ga*MjA0MjU1MTc3Ni4xNzY2MTc3OTI1*_ga_NZSJ72N6RX*czE3NjYxNzc5MjckbzEkZzEkdDE3NjYxNzc5MjckajYwJGwwJGgw",
       "1. Install the Blynk App from the Google play store or App store. Then create an account and tap on the New Project.",
 
       "2. Give the name to the project, select ESP32 Dev Board, Connection type will be WiFi. Then tap on Create.",
 
       "3. Blynk will send an authentication token to the registered email id. Tap on OK.",
-
+      },
       
-      "Step 5: Add the Button Widgets in Blynk App",
+      {"Step 5: Add the Button Widgets in Blynk App",
       "https://content.instructables.com/F9K/QW43/KJEAG18V/F9KQW43KJEAG18V.jpg?auto=webp&frame=1&width=1024&height=1024&fit=bounds&md=MjAyMS0wMS0wMSAyMDowNDozOC4w",
       "Then add 8 button widgets to control the 8 relays. Here I have used virtual pins V1, V2, V3, V4, V5, V6, V7, V8 for 8 buttons. And mode will be Switch.",
-
+      },
       
-      "Step 6: Code for Blynk ESP32 Home Automation",
+      {"Step 6: Code for Blynk ESP32 Home Automation",
       "https://content.instructables.com/FQ0/733Z/KJEAG19R/FQ0733ZKJEAG19R.jpg?auto=webp&frame=1&crop=3:2&width=800&fit=bounds&md=MjAyMS0wMS0wMSAyMDowNToxNi4w",
       "Before uploading the code you have to install the ESP32 board and Blynk library.",
 
@@ -534,7 +564,7 @@ void loop()
       "Select the DOIT ESP32 DEVKIT V1 board and proper PORT.",
 
       "Then upload the code to ESP32 Board.",
-      
+      },
     ],
   },
 };
