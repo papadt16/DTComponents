@@ -9,6 +9,7 @@ import AdminProjects from "./pages/AdminProjects.jsx";
 import ProjectDetails from "./pages/ProjectDetails.jsx";
 import ProductDetails from "./pages/ProductDetails.jsx";
 import OrderHistoryPage from "./pages/OrderHistoryPage.jsx";
+import OrderDetailsPage from "./pages/OrderDetailsPage.jsx";
 
 export default function App() {
   const [cart, setCart] = useState([]);
