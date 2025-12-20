@@ -515,7 +515,7 @@ void loop()
       "The ESP32 will check for the WiFi after every 3 seconds. When the WiFi is available, the ESP32 will automatically connect with the WiFi.",
 
       
-      "Step 4: Configure the Blynk App for the ESP32"
+      "Step 4: Configure the Blynk App for the ESP32",
       "https://content.instructables.com/FN2/L5IA/KJEAG18W/FN2L5IAKJEAG18W.jpg?auto=webp&frame=1&width=1024&height=1024&fit=bounds&md=MjAyMS0wMS0wMSAyMDowNDo0MS4w&_gl=1*3ddldx*_ga*MjA0MjU1MTc3Ni4xNzY2MTc3OTI1*_ga_NZSJ72N6RX*czE3NjYxNzc5MjckbzEkZzEkdDE3NjYxNzc5MjckajYwJGwwJGgw",
       "1. Install the Blynk App from the Google play store or App store. Then create an account and tap on the New Project.",
 
