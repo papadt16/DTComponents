@@ -510,7 +510,7 @@ void loop()
 
       "Step 3: Control Relays Without Internet Using Push-buttons",
 
-      "If the WiFi is not available, you can control the relays from the pushbuttons.
+      "If the WiFi is not available, you can control the relays from the pushbuttons.",
 
       "The ESP32 will check for the WiFi after every 3 seconds. When the WiFi is available, the ESP32 will automatically connect with the WiFi.",
 
