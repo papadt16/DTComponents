@@ -43,6 +43,8 @@ export default function Shop() {
 
     localStorage.setItem("dt_cart", JSON.stringify(cart));
     showToast(`${product.title} added to cart`);
+
+    updateCart(updated);
   }
 
   function showToast(message) {
