@@ -1,6 +1,8 @@
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 
+const WHATSAPP_NUMBER = "2349038899075";
+
 export default function Home() {
   const [query, setQuery] = useState("");
   const navigate = useNavigate();
@@ -11,12 +13,29 @@ export default function Home() {
     navigate(`/shop?search=${encodeURIComponent(query)}`);
   }
 
+  const handleWhatsAppClick = () => {
+    const msg = encodeURIComponent(
+      "Hey DTComponents, I couldn't find the component I was looking for. Please assist me."
+    );
+    window.open(`https://wa.me/${WHATSAPP_NUMBER}?text=${msg}`, "_blank");
+  };
+
   return (
     <>
       {/* ===== HERO ===== */}
       <div style={container}>
         <div style={overlay}>
           <h1 style={title}>DTComponents</h1>
+
+          {/* ===== NEW CTA ===== */}
+          <p style={ctaText}>
+            Couldn't find a component?{" "}
+            <span style={ctaLink} onClick={handleWhatsAppClick}>
+              Click here
+            </span>{" "}
+            to let us know what you were looking for
+          </p>
+
           <p style={subtitle}>Find any electronic component instantly</p>
 
           <form onSubmit={handleSearch} style={searchBox}>
@@ -58,7 +77,6 @@ export default function Home() {
 }
 
 /* ===== STATIC PROJECT DATA (TEMP) ===== */
-
 const projects = [
   {
     slug: "smart-home-automation",
@@ -91,7 +109,6 @@ const projects = [
 ];
 
 /* ===== STYLES ===== */
-
 const container = {
   minHeight: "100vh",
   backgroundColor: "black",
@@ -120,6 +137,18 @@ const title = {
   fontWeight: "bold",
 };
 
+const ctaText = {
+  marginTop: "10px",
+  fontSize: "16px",
+  opacity: 0.9,
+};
+
+const ctaLink = {
+  color: "#0ea5e9",
+  textDecoration: "underline",
+  cursor: "pointer",
+};
+
 const subtitle = {
   marginTop: "10px",
   fontSize: "18px",
@@ -127,7 +156,7 @@ const subtitle = {
 };
 
 const searchBox = {
-  marginTop: "30px",
+  marginTop: "20px",
   display: "flex",
   width: "100%",
   maxWidth: "600px",
@@ -151,7 +180,6 @@ const button = {
 };
 
 /* ===== PROJECTS ===== */
-
 const projectsSection = {
   padding: "80px 40px",
   background: "#020617",
@@ -210,4 +238,3 @@ const projectBtn = {
   borderRadius: "6px",
   cursor: "pointer",
 };
-
