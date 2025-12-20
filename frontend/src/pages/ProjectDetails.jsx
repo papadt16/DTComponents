@@ -565,7 +565,7 @@ void loop()
       },
       
       {title: "Step 6: Code for Blynk ESP32 Home Automation",
-      img: "https://content.instructables.com/FQ0/733Z/KJEAG19R/FQ0733ZKJEAG19R.jpg?auto=webp&frame=1&crop=3:2&width=800&fit=bounds&md=MjAyMS0wMS0wMSAyMDowNToxNi4w",
+      img: "https://content.instructables.com/FX1/CL1G/KJEAG19S/FX1CL1GKJEAG19S.jpg?auto=webp&frame=1&width=1024&height=1024&fit=bounds&md=MjAyMS0wMS0wMSAyMDowNToxOC4w&_gl=1*z5m73n*_ga*MjA0MjU1MTc3Ni4xNzY2MTc3OTI1*_ga_NZSJ72N6RX*czE3NjYyMzA5MjMkbzMkZzEkdDE3NjYyMzA5MjMkajYwJGwwJGgw",
       text: [
       "Before uploading the code you have to install the ESP32 board and Blynk library.",
 
@@ -633,7 +633,7 @@ const explanationBlock = {
 const stepTitle = {
   fontSize: "20px",
   marginBottom: "15px",
-  color: "#38bdf8",
+  color: "black",
 };
 
 const explanationImage = {
@@ -646,6 +646,6 @@ const explanationImage = {
 const explanationText = {
   marginBottom: "18px", 
   lineHeight: "1.7",
-  color: "#e5e7eb",
+  color: "black",
 };
 
