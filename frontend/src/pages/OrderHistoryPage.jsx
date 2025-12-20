@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 
-export default function OrderHistoryPage() {
+export default function OrderHistoryPage({ loadOrderIntoCart }) {
   const [orders, setOrders] = useState([]);
   const navigate = useNavigate();
 
@@ -15,6 +15,12 @@ export default function OrderHistoryPage() {
   if (!orders.length) {
     return <h2 style={{ padding: 30 }}>No previous orders</h2>;
   }
+
+  const handleReorder = (items) => {
+    const clonedItems = items.map((item) => ({ ...item }));
+    loadOrderIntoCart(clonedItems); // <-- update App.jsx cart state
+    navigate("/cart"); // go to cart
+  };
 
   return (
     <div style={{ padding: "30px" }}>
@@ -36,11 +42,7 @@ export default function OrderHistoryPage() {
 
             <button
               style={reorderBtn}
-              onClick={() => {
-                const clonedItems = order.items.map((item) => ({ ...item }));
-                localStorage.setItem("dt_cart", JSON.stringify(clonedItems));
-                navigate("/cart");
-              }}
+              onClick={() => handleReorder(order.items)}
             >
               🔁 Reorder
             </button>
@@ -52,7 +54,6 @@ export default function OrderHistoryPage() {
 }
 
 /* ===== STYLES ===== */
-
 const orderCard = {
   padding: 15,
   marginBottom: 20,
