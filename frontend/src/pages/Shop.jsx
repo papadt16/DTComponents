@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from "react";
 import { useSearchParams, useNavigate } from "react-router-dom";
 import axios from "axios";
@@ -207,5 +206,4 @@ const toastStyle = {
   padding: "12px 18px",
   borderRadius: "6px",
   boxShadow: "0 4px 12px rgba(0,0,0,0.2)",
-}; 
-
+};
