@@ -8,7 +8,9 @@ export default function CartPage({ cart, updateCart }) {
 
   const increaseQty = (productId) => {
     const updated = cart.map((item) =>
-      item._id === productId ? { ...item, qty: item.qty + 1 } : item
+      item._id === productId
+        ? { ...item, qty: item.qty + 1 }
+        : item
     );
     updateCart(updated);
   };
@@ -18,21 +20,22 @@ export default function CartPage({ cart, updateCart }) {
 
     if (item.qty === 1) {
       if (window.confirm(`Remove ${item.title} from cart?`)) {
-        const updated = cart.filter((i) => i._id !== productId);
-        updateCart(updated);
+        updateCart(cart.filter((i) => i._id !== productId));
       }
     } else {
-      const updated = cart.map((i) =>
-        i._id === productId ? { ...i, qty: i.qty - 1 } : i
+      updateCart(
+        cart.map((i) =>
+          i._id === productId
+            ? { ...i, qty: i.qty - 1 }
+            : i
+        )
       );
-      updateCart(updated);
     }
   };
 
   const removeItem = (productId) => {
     if (window.confirm("Are you sure you want to remove this item?")) {
-      const updated = cart.filter((i) => i._id !== productId);
-      updateCart(updated);
+      updateCart(cart.filter((i) => i._id !== productId));
     }
   };
 
@@ -73,11 +76,10 @@ export default function CartPage({ cart, updateCart }) {
       y += 7;
     });
 
-    y += 6;
+    y += 4;
     doc.line(14, y, 195, y);
     y += 8;
 
-    doc.setFontSize(11);
     doc.text(
       `Grand Total: ₦${total().toLocaleString()}`,
       195,
@@ -87,7 +89,6 @@ export default function CartPage({ cart, updateCart }) {
 
     doc.save("DTComponents_BOQ.pdf");
 
-    // WhatsApp message
     let msg =
       "Hello DTComponents,%0A%0APlease find my BOQ attached.%0A%0AOrder Summary:%0A";
 
@@ -103,20 +104,20 @@ export default function CartPage({ cart, updateCart }) {
     );
 
     // Save order history
-    const orderHistory = JSON.parse(
+    const history = JSON.parse(
       localStorage.getItem("dt_order_history") || "[]"
     );
 
-    const newOrder = {
+    history.unshift({
       id: Date.now(),
       date: new Date().toLocaleString(),
-      items: cart,
+      items: cart.map(i => ({ ...i })),
       total: total(),
-    };
+    });
 
     localStorage.setItem(
       "dt_order_history",
-      JSON.stringify([newOrder, ...orderHistory])
+      JSON.stringify(history)
     );
 
     // Clear cart
@@ -128,12 +129,13 @@ export default function CartPage({ cart, updateCart }) {
   }
 
   return (
-    <div style={{ padding: "30px" }}>
+    <div style={{ padding: 30 }}>
       <h2>Your Cart</h2>
 
       {cart.map((p) => (
         <div key={p._id} style={cartItem}>
           <img src={p.img} alt={p.title} style={img} />
+
           <div style={{ flex: 1 }}>
             <h4>{p.title}</h4>
             <p>₦{p.price}</p>
@@ -158,7 +160,7 @@ export default function CartPage({ cart, updateCart }) {
 
       <button
         onClick={generatePdfAndSendWhatsApp}
-        style={greenBtn}
+        style={checkoutBtn}
       >
         Generate BOQ PDF & Send to WhatsApp
       </button>
@@ -167,7 +169,7 @@ export default function CartPage({ cart, updateCart }) {
 
       <button
         onClick={() => navigate("/orders")}
-        style={blueBtn}
+        style={historyBtn}
       >
         View Order History
       </button>
@@ -208,7 +210,7 @@ const removeBtn = {
   cursor: "pointer",
 };
 
-const greenBtn = {
+const checkoutBtn = {
   padding: "12px 20px",
   background: "#16a34a",
   color: "white",
@@ -218,7 +220,7 @@ const greenBtn = {
   cursor: "pointer",
 };
 
-const blueBtn = {
+const historyBtn = {
   padding: "10px 18px",
   background: "#2563eb",
   color: "white",
