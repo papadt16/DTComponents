@@ -4,7 +4,7 @@ import axios from "axios";
 
 const API = "https://dtcomponents-backend.onrender.com";
 
-export default function Shop() {
+export default function Shop({ cart, updateCart }) {
   const [products, setProducts] = useState([]);
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
@@ -23,28 +23,33 @@ export default function Shop() {
     loadProducts();
   }, [search, category]);
 
-  // ✅ ADD TO CART
+  // ✅ ADD TO CART (STATE-DRIVEN)
   function addToCart(product) {
-    const cart = JSON.parse(localStorage.getItem("dt_cart")) || [];
-
     const existing = cart.find((item) => item._id === product._id);
 
+    let updatedCart;
+
     if (existing) {
-      existing.qty += 1;
+      updatedCart = cart.map((item) =>
+        item._id === product._id
+          ? { ...item, qty: item.qty + 1 }
+          : item
+      );
     } else {
-      cart.push({
-        _id: product._id,
-        title: product.title,
-        price: product.price,
-        img: product.img,
-        qty: 1,
-      });
+      updatedCart = [
+        ...cart,
+        {
+          _id: product._id,
+          title: product.title,
+          price: product.price,
+          img: product.img,
+          qty: 1,
+        },
+      ];
     }
 
-    localStorage.setItem("dt_cart", JSON.stringify(cart));
+    updateCart(updatedCart);
     showToast(`${product.title} added to cart`);
-
-    updateCart(updated);
   }
 
   function showToast(message) {
@@ -64,7 +69,11 @@ export default function Shop() {
           style={input}
         />
 
-        <select value={category} onChange={(e) => setCategory(e.target.value)} style={select}>
+        <select
+          value={category}
+          onChange={(e) => setCategory(e.target.value)}
+          style={select}
+        >
           <option>All</option>
           <option>Microcontrollers</option>
           <option>Sensors</option>
@@ -82,19 +91,25 @@ export default function Shop() {
       </div>
 
       <div style={grid}>
-       {products.map((p) => (
-           <div
-           key={p._id}
-           style={card}
-           onClick={() => navigate(`/product/${p._id}`)}
-            onMouseEnter={(e) => (e.currentTarget.style.transform = "translateY(-5px)")}
-            onMouseLeave={(e) => (e.currentTarget.style.transform = "translateY(0)")}
+        {products.map((p) => (
+          <div
+            key={p._id}
+            style={card}
+            onClick={() => navigate(`/product/${p._id}`)}
+            onMouseEnter={(e) =>
+              (e.currentTarget.style.transform = "translateY(-5px)")
+            }
+            onMouseLeave={(e) =>
+              (e.currentTarget.style.transform = "translateY(0)")
+            }
           >
             <img
               src={p.img || "https://via.placeholder.com/200"}
               alt={p.title}
               style={image}
-              onError={(e) => (e.target.src = "https://via.placeholder.com/200")}
+              onError={(e) =>
+                (e.target.src = "https://via.placeholder.com/200")
+              }
             />
 
             <h4 style={productTitle}>{p.title}</h4>
@@ -103,13 +118,13 @@ export default function Shop() {
             <p style={price}>₦{p.price}</p>
 
             <button
-             style={btn}
-             onClick={(e) => {
-             e.stopPropagation();
-             addToCart(p);
-             }}
-             >
-             Add to Cart
+              style={btn}
+              onClick={(e) => {
+                e.stopPropagation();
+                addToCart(p);
+              }}
+            >
+              Add to Cart
             </button>
           </div>
         ))}
