@@ -1,6 +1,5 @@
 import { useParams } from "react-router-dom";
 import { useState, useEffect } from "react";
-import axios from "axios";
 import API from "../utils/api";
 
 export default function ProjectDetails() {
@@ -8,17 +7,14 @@ export default function ProjectDetails() {
   const [project, setProject] = useState(null);
   const [error, setError] = useState("");
 
-  useEffect(() => {
-    axios
-      .get(`${API}/projects/${slug}`)
-      .then((res) => {
-        setProject(res.data);
-      })
-      .catch((err) => {
-        console.error(err);
-        setError("Project not found");
-      });
-  }, [slug]);
+useEffect(() => {
+  const data = projects[slug];
+  if (data) {
+    setProject(data);
+  } else {
+    setProject(null);
+  }
+}, [slug]);
 
   if (error) {
     return <p style={{ padding: 40 }}>{error}</p>;
