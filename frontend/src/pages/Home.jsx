@@ -22,19 +22,24 @@ export default function Home() {
 
   return (
     <>
+       {/* ===== TOP WHATSAPP BANNER ===== */}
+      <div style={whatsappBanner}>
+        <a
+          href={`https://wa.me/2349038899075?text=${encodeURIComponent(
+            "Hey DTComponents, I couldn’t find the component I was looking for. The component I need is: [Type component name here]"
+          )}`}
+          target="_blank"
+          rel="noopener noreferrer"
+          style={bannerLink}
+        >
+          Couldn’t find a component? Click here to let us know what you were looking for
+        </a>
+      </div>
+      
       {/* ===== HERO ===== */}
       <div style={container}>
         <div style={overlay}>
           <h1 style={title}>DTComponents</h1>
-
-          {/* ===== NEW CTA ===== */}
-          <p style={ctaText}>
-            Couldn't find a component/tool?{" "}
-            <span style={ctaLink} onClick={handleWhatsAppClick}>
-              Click here
-            </span>{" "}
-            to let us know what you were looking for
-          </p>
 
           <p style={subtitle}>Find any electronic component instantly</p>
 
@@ -238,3 +243,20 @@ const projectBtn = {
   borderRadius: "6px",
   cursor: "pointer",
 };
+
+const whatsappBanner = {
+  width: "100%",
+  padding: "12px 0",
+  background: "#25D366", // WhatsApp green
+  textAlign: "center",
+  fontWeight: "bold",
+  color: "white",
+  cursor: "pointer",
+};
+
+const bannerLink = {
+  color: "white",
+  textDecoration: "none",
+  fontSize: "16px",
+};
+
