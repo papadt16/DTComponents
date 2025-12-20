@@ -57,7 +57,7 @@ export default function App() {
           path="/orders"
           element={<OrderHistoryPage loadOrderIntoCart={loadOrderIntoCart} />}
         />
-
+        <Route path="/orders/:id" element={<OrderDetailsPage />} />
         <Route path="/projects/:slug" element={<ProjectDetails />} />
         <Route path="/admin/projects" element={<AdminProjects />} />
         <Route path="/admin" element={<ProtectedAdmin />} />
