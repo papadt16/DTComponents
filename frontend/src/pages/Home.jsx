@@ -247,7 +247,7 @@ const projectBtn = {
 const whatsappBanner = {
   width: "100%",
   padding: "12px 0",
-  background: "#25D366", // WhatsApp green
+  background: "#020617", // WhatsApp green
   textAlign: "center",
   fontWeight: "bold",
   color: "white",
