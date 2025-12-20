@@ -188,4 +188,4 @@ const removeBtn = {
   padding: "6px 12px",
   borderRadius: 6,
   cursor: "pointer",
-};"
+};
