@@ -69,29 +69,33 @@ useEffect(() => {
 </Section>
 
 
-     <Section title="Code Explanation">
-  <div style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
-    {project.explanation.map((item, i) => (
-      <div key={i}>
-        <p style={{ fontSize: "16px", lineHeight: 1.7 }}>
-          {item.text}
-        </p>
+    {/* EXPLANATION */}
+<Section title="Explanation">
+  {project.explanation.map((step, i) => (
+    <div key={i} style={explanationBlock}>
+      
+      {/* STEP TITLE */}
+      <h3 style={stepTitle}>{step.title}</h3>
 
-        {item.image && (
-          <img
-            src={item.image}
-            alt="explanation"
-            style={{
-              width: "100%",
-              maxWidth: "500px",
-              marginTop: "15px",
-              borderRadius: "6px",
-            }}
-          />
-        )}
-      </div>
-    ))}
-  </div>
+      {/* IMAGE (if present) */}
+      {step.img && (
+        <img
+          src={step.img}
+          alt={step.title}
+          style={explanationImage}
+        />
+      )}
+
+      {/* TEXT */}
+      {Array.isArray(step.text) ? (
+        step.text.map((line, j) => (
+          <p key={j} style={explanationText}>{line}</p>
+        ))
+      ) : (
+        <p style={explanationText}>{step.text}</p>
+      )}
+    </div>
+  ))}
 </Section>
     </div>
   );
@@ -523,7 +527,6 @@ void loop()
       {title: "Step 1: Circuit Diagram of the ESP32 Project",
       
       text: [
-      "This is the complete circuit diagram for this home automation project. I have explained the circuit in the tutorial video.",
       "The circuit is very simple, I have used the GPIO pins D23, D22, D21, D19, D18, D5, D25 & D26 to control the 8 relays.",
       "And the GPIO pins D13, D12, D14, D27, D33, D32, D15 & D4 connected with push buttons to control the 8 relays manually.",
       "I have used the INPUT_PULLUP function in Arduino IDE instead of using the pull-up resistors.",
@@ -622,3 +625,27 @@ const codeBox = {
   overflowX: "auto",
   fontSize: "14px",
 };
+
+const explanationBlock = {
+  marginBottom: "50px",
+};
+
+const stepTitle = {
+  fontSize: "20px",
+  marginBottom: "15px",
+  color: "#38bdf8",
+};
+
+const explanationImage = {
+  width: "100%",
+  maxWidth: "700px",
+  borderRadius: "8px",
+  marginBottom: "20px",
+};
+
+const explanationText = {
+  marginBottom: "18px", 
+  lineHeight: "1.7",
+  color: "#e5e7eb",
+};
+
