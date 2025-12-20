@@ -132,13 +132,6 @@ const projects = {
     schematic:
       "https://content.instructables.com/FDR/A47B/KJEAG18Y/FDRA47BKJEAG18Y.jpg?auto=webp&frame=1&width=1024&height=1024&fit=bounds&md=MjAyMS0wMS0wMSAyMDowNDo0Ni4w",
     code: `
-/**********************************************************************************
- *  TITLE: ESP32 Home Automation project using Blynk | Internet & Manual control with Realtime Feedback | 8-CHANNEL RELAY
- *  Click on the following links to learn more. 
- *  YouTube Video: https://youtu.be/o1e5s_5p3FU
- *  Related Blog : https://iotcircuithub.com/blynk-esp32-home-automation/
- *  by Tech StudyCell
- **********************************************************************************/
 /*************************************************************
   Update the Preferences –> Aditional boards Manager URLs: 
   https://dl.espressif.com/dl/package_esp32_index.json, http://arduino.esp8266.com/stable/package_esp8266com_index.json
