@@ -556,7 +556,7 @@ const page = {
   padding: "50px",
   maxWidth: "900px",
   margin: "auto",
-  color: "white",
+  color: "black",
 };
 
 const title = {
