@@ -23,6 +23,10 @@ export default function CartPage() {
     updateCart(updated);
   };
 
+  const loadOrderIntoCart = (items) => {
+  updateCart(items); // overwrites current cart
+};
+
   const decreaseQty = (productId) => {
     const item = cart.find((i) => i._id === productId);
     if (item.qty === 1) {
@@ -50,17 +54,14 @@ export default function CartPage() {
 const generatePdfAndSendWhatsApp = () => {
   const doc = new jsPDF();
 
-  // Header
+  // === PDF generation code remains the same ===
   doc.setFontSize(16);
   doc.text("DTComponents", 105, 15, { align: "center" });
-
   doc.setFontSize(11);
   doc.text("Bill of Quantities (BOQ)", 105, 22, { align: "center" });
-
   doc.setFontSize(10);
   doc.text(`Date: ${new Date().toLocaleDateString()}`, 14, 30);
 
-  // Table header
   let y = 40;
   doc.setFontSize(10);
   doc.text("S/N", 14, y);
@@ -73,7 +74,6 @@ const generatePdfAndSendWhatsApp = () => {
   doc.line(14, y, 195, y);
   y += 6;
 
-  // Table rows
   cart.forEach((item, index) => {
     doc.text(String(index + 1), 14, y);
     doc.text(item.title, 25, y);
@@ -87,7 +87,6 @@ const generatePdfAndSendWhatsApp = () => {
   doc.line(14, y, 195, y);
   y += 8;
 
-  // Total
   doc.setFontSize(11);
   doc.text(
     `Grand Total: ₦${total().toLocaleString()}`,
@@ -96,22 +95,31 @@ const generatePdfAndSendWhatsApp = () => {
     { align: "right" }
   );
 
-  // Save PDF
   const fileName = "DTComponents_BOQ.pdf";
   doc.save(fileName);
 
   // WhatsApp message
-  let msg =
-    "Hello DTComponents,%0A%0APlease find my BOQ attached.%0A%0AOrder Summary:%0A";
-
+  let msg = "Hello DTComponents,%0A%0APlease find my BOQ attached.%0A%0AOrder Summary:%0A";
   cart.forEach((p) => {
     msg += `- ${p.qty} x ${p.title}%0A`;
   });
-
   msg += `%0AGrand Total: ₦${total().toLocaleString()}%0A%0AThank you.`;
 
   window.open(`https://wa.me/${WHATSAPP_NUMBER}?text=${msg}`, "_blank");
+
+  // === NEW CODE: Save order to history and clear cart ===
+  const orderHistory = JSON.parse(localStorage.getItem("dt_order_history") || "[]");
+  const newOrder = {
+    id: Date.now(), // unique order ID
+    date: new Date().toLocaleString(),
+    items: cart,
+    total: total(),
   };
+  localStorage.setItem("dt_order_history", JSON.stringify([newOrder, ...orderHistory]));
+
+  // Clear cart
+  updateCart([]);
+};
 
   if (!cart.length) return <h2 style={{ padding: 30 }}>Your cart is empty</h2>;
 
