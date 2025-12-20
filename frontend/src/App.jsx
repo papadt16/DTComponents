@@ -1,14 +1,33 @@
 import { Routes, Route, Link } from "react-router-dom";
+import { useState, useEffect } from "react";
+
 import Home from "./pages/Home.jsx";
 import Shop from "./pages/Shop.jsx";
 import CartPage from "./pages/CartPage.jsx";
 import AdminPage from "./pages/AdminPage.jsx";
 import AdminProjects from "./pages/AdminProjects.jsx";
-import ProjectDetails from "./pages/ProjectDetails";
+import ProjectDetails from "./pages/ProjectDetails.jsx";
 import ProductDetails from "./pages/ProductDetails.jsx";
-
+import OrderHistoryPage from "./pages/OrderHistoryPage.jsx";
 
 export default function App() {
+  const [cart, setCart] = useState([]);
+
+  // Load cart from localStorage
+  useEffect(() => {
+    const storedCart = JSON.parse(localStorage.getItem("dt_cart") || "[]");
+    setCart(storedCart);
+  }, []);
+
+  const updateCart = (newCart) => {
+    setCart(newCart);
+    localStorage.setItem("dt_cart", JSON.stringify(newCart));
+  };
+
+  const loadOrderIntoCart = (items) => {
+    updateCart(items);
+  };
+
   return (
     <>
       <nav style={navStyle}>
@@ -17,7 +36,6 @@ export default function App() {
           <Link to="/" style={linkStyle}>Home</Link>
           <Link to="/shop" style={linkStyle}>Shop</Link>
           <Link to="/cart" style={linkStyle}>Cart</Link>
-          {/* ❌ Admin link REMOVED */}
         </div>
       </nav>
 
@@ -25,11 +43,17 @@ export default function App() {
         <Route path="/" element={<Home />} />
         <Route path="/shop" element={<Shop />} />
         <Route path="/product/:id" element={<ProductDetails />} />
-        <Route path="/cart" element={<CartPage />} />
+
         <Route
-  path="/orders"
-  element={<OrderHistoryPage loadOrderIntoCart={loadOrderIntoCart} />}
-/>
+          path="/cart"
+          element={<CartPage cart={cart} updateCart={updateCart} />}
+        />
+
+        <Route
+          path="/orders"
+          element={<OrderHistoryPage loadOrderIntoCart={loadOrderIntoCart} />}
+        />
+
         <Route path="/projects/:slug" element={<ProjectDetails />} />
         <Route path="/admin/projects" element={<AdminProjects />} />
         <Route path="/admin" element={<ProtectedAdmin />} />
@@ -37,6 +61,7 @@ export default function App() {
     </>
   );
 }
+
 
 /* ===== ADMIN PROTECTION ===== */
 function ProtectedAdmin() {
