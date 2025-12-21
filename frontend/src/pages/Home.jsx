@@ -33,7 +33,7 @@ export default function Home() {
            "I couldn’t find the component I was looking for.%0A" +
            "The component I need is:%0A" +
            "[Type component name here]";
-          )}`}
+          );}`}
           target="_blank"
           rel="noopener noreferrer"
           style={bannerLink}
