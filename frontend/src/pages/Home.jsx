@@ -18,7 +18,7 @@ export default function Home() {
     "Hey DTComponents,%0A" +
     "I couldn’t find the component I was looking for.%0A" +
     "The component I need is:%0A" +
-    "[Type component name here]";
+    "[Type component name here]"
     );
     window.open(`https://wa.me/${WHATSAPP_NUMBER}?text=${msg}`, "_blank");
   };
