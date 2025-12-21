@@ -15,10 +15,7 @@ export default function Home() {
 
   const handleWhatsAppClick = () => {
     const msg = encodeURIComponent(
-    "Hey DTComponents,%0A" +
-    "I couldn’t find the component I was looking for.%0A" +
-    "The component I need is:%0A" +
-    "[Type component name here]";
+    "Hey DTComponents, I couldn’t find the component I was looking for. The component I need is: [Type component name here]"
     );
     window.open(`https://wa.me/${WHATSAPP_NUMBER}?text=${msg}`, "_blank");
   };
@@ -29,10 +26,7 @@ export default function Home() {
       <div style={whatsappBanner}>
         <a
           href={`https://wa.me/2349038899075?text=${encodeURIComponent(
-          "Hey DTComponents,%0A" +
-          "I couldn’t find the component I was looking for.%0A" +
-          "The component I need is:%0A" +
-          "[Type component name here]";
+          "Hey DTComponents, I couldn’t find the component I was looking for. The component I need is: [Type component name here]"
           )}`}
           target="_blank"
           rel="noopener noreferrer"
