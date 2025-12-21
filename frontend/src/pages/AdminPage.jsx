@@ -6,7 +6,7 @@ const API = "https://dtcomponents-backend.onrender.com";
 const emptyDescription = {
   overview: "",
   features: [],
-  applications: [],
+  applications: [], 
   specifications: {},
 };
 
