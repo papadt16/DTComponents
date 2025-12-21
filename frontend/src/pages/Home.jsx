@@ -26,7 +26,7 @@ export default function Home() {
       <div style={whatsappBanner}>
         <a
           href={`https://wa.me/2349038899075?text=${encodeURIComponent(
-            "Hey DTComponents, I couldn’t find the component I was looking for. The component I need is: [Type component name here]"
+            "Hey DTComponents,%0AI couldn’t find the component I was looking for.%0AThe component I need is:%0A[Type component name here]"
           )}`}
           target="_blank"
           rel="noopener noreferrer"
