@@ -1,7 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 
-const WHATSAPP_NUMBER = "2349038899075";
+const WHATSAPP_NUMBER = "2349038899075"; 
 
 export default function Home() {
   const [query, setQuery] = useState("");
