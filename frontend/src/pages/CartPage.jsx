@@ -1,5 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import jsPDF from "jspdf";
+import autoTable from "jspdf-autotable";
 
 const WHATSAPP_NUMBER = "2349038899075";
 
@@ -42,87 +43,98 @@ export default function CartPage({ cart, updateCart }) {
   const total = () =>
     cart.reduce((sum, p) => sum + p.price * p.qty, 0);
 
-  const generatePdfAndSendWhatsApp = () => {
-    const doc = new jsPDF();
 
-    doc.setFontSize(16);
-    doc.text("DTComponents", 105, 15, { align: "center" });
-    doc.setFontSize(11);
-    doc.text("Bill of Quantities (BOQ)", 105, 22, { align: "center" });
-    doc.setFontSize(10);
-    doc.text(`Date: ${new Date().toLocaleDateString()}`, 14, 30);
+const generatePdfAndSendWhatsApp = () => {
+  const doc = new jsPDF();
 
-    let y = 40;
-    doc.text("S/N", 14, y);
-    doc.text("Description", 25, y);
-    doc.text("Qty", 130, y);
-    doc.text("Unit (₦)", 145, y);
-    doc.text("Amount (₦)", 170, y);
+  // HEADER
+  doc.setFontSize(16);
+  doc.text("DTComponents", 105, 15, { align: "center" });
 
-    y += 6;
-    doc.line(14, y, 195, y);
-    y += 6;
+  doc.setFontSize(12);
+  doc.text("Bill of Quantities (BOQ)", 105, 22, { align: "center" });
 
-    cart.forEach((item, index) => {
-      doc.text(String(index + 1), 14, y);
-      doc.text(item.title, 25, y);
-      doc.text(String(item.qty), 130, y);
-      doc.text(item.price.toLocaleString(), 145, y);
-      doc.text(
-        (item.qty * item.price).toLocaleString(),
-        170,
-        y
-      );
-      y += 7;
-    });
+  doc.setFontSize(10);
+  doc.text(`Date: ${new Date().toLocaleDateString()}`, 14, 30);
 
-    y += 4;
-    doc.line(14, y, 195, y);
-    y += 8;
+  // TABLE DATA
+  const tableBody = cart.map((item, index) => [
+    index + 1,
+    item.title,
+    item.qty,
+    item.price.toLocaleString(),
+    (item.qty * item.price).toLocaleString(),
+  ]);
 
-    doc.text(
-      `Grand Total: ₦${total().toLocaleString()}`,
-      195,
-      y,
-      { align: "right" }
-    );
+  autoTable(doc, {
+    startY: 40,
+    head: [["S/N", "Description", "Qty", "Unit (NGN)", "Amount (NGN)"]],
+    body: tableBody,
+    styles: {
+      fontSize: 10,
+      cellPadding: 3,
+    },
+    headStyles: {
+      fillColor: [15, 23, 42], // dark blue
+      textColor: 255,
+    },
+    columnStyles: {
+      0: { cellWidth: 12 },
+      1: { cellWidth: 80 },
+      2: { cellWidth: 15 },
+      3: { cellWidth: 30 },
+      4: { cellWidth: 30 },
+    },
+  });
 
-    doc.save("DTComponents_BOQ.pdf");
+  // TOTAL
+  const finalY = doc.lastAutoTable.finalY + 10;
+  doc.setFontSize(12);
+  doc.text(
+    `Grand Total: NGN ${total().toLocaleString()}`,
+    195,
+    finalY,
+    { align: "right" }
+  );
 
-    let msg =
-      "Hello DTComponents,%0A%0APlease find my BOQ attached.%0A%0AOrder Summary:%0A";
+  // SAVE
+  doc.save("DTComponents_BOQ.pdf");
 
-    cart.forEach((p) => {
-      msg += `- ${p.qty} x ${p.title}%0A`;
-    });
+  // WHATSAPP MESSAGE
+  let msg =
+    "Hello DTComponents,%0A%0APlease find my BOQ.%0A%0AOrder Summary:%0A";
 
-    msg += `%0AGrand Total: ₦${total().toLocaleString()}%0A%0AThank you.`;
+  cart.forEach((p) => {
+    msg += `- ${p.qty} x ${p.title}%0A`;
+  });
 
-    window.open(
-      `https://wa.me/${WHATSAPP_NUMBER}?text=${msg}`,
-      "_blank"
-    );
+  msg += `%0AGrand Total: NGN ${total().toLocaleString()}%0A%0AThank you.`;
 
-    // Save order history
-    const history = JSON.parse(
-      localStorage.getItem("dt_order_history") || "[]"
-    );
+  window.open(
+    `https://wa.me/${WHATSAPP_NUMBER}?text=${msg}`,
+    "_blank"
+  );
 
-    history.unshift({
-      id: Date.now(),
-      date: new Date().toLocaleString(),
-      items: cart.map(i => ({ ...i })),
-      total: total(),
-    });
+  // SAVE ORDER HISTORY
+  const history = JSON.parse(
+    localStorage.getItem("dt_order_history") || "[]"
+  );
 
-    localStorage.setItem(
-      "dt_order_history",
-      JSON.stringify(history)
-    );
+  history.unshift({
+    id: Date.now(),
+    date: new Date().toLocaleString(),
+    items: cart.map(i => ({ ...i })),
+    total: total(),
+  });
 
-    // Clear cart
-    updateCart([]);
-  };
+  localStorage.setItem(
+    "dt_order_history",
+    JSON.stringify(history)
+  );
+
+  // CLEAR CART
+  updateCart([]);
+};
 
  if (!cart.length) {
   return (
