@@ -15,7 +15,7 @@ export default function Home() {
 
   const handleWhatsAppClick = () => {
     const msg = encodeURIComponent(
-      "Hey DTComponents, I couldn’t find the component I was looking for. The component I need is: [Type component name here]"
+      "Hey DTComponents,%0AI couldn’t find the component I was looking for.%0AThe component I need is:%0A[Type component name here]"
     );
     window.open(`https://wa.me/${WHATSAPP_NUMBER}?text=${msg}`, "_blank");
   };
