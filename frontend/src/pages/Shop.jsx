@@ -3,22 +3,7 @@ import { useSearchParams, useNavigate } from "react-router-dom";
 import axios from "axios";
 import API from "../utils/api.js";
 import { authHeaders, isLoggedIn } from "../utils/auth.js";
-
-const CATEGORIES = [
-  "All",
-  "Microcontrollers",
-  "Sensors",
-  "ICs",
-  "Resistors",
-  "Capacitors",
-  "Modules",
-  "Tools",
-  "Displays",
-  "Switches",
-  "Transistors",
-  "Diodes",
-  "Connectors",
-];
+import SearchPreview from "../components/SearchPreview.jsx";
 
 function stockInfo(stock) {
   if (stock === undefined || stock === null) return null; // older records without stock tracked yet
@@ -29,6 +14,7 @@ function stockInfo(stock) {
 
 export default function Shop({ cart, updateCart }) {
   const [products, setProducts] = useState([]);
+  const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
   const [wishlistIds, setWishlistIds] = useState(new Set());
   const navigate = useNavigate();
@@ -36,6 +22,7 @@ export default function Shop({ cart, updateCart }) {
   const [search, setSearch] = useState(searchParams.get("search") || "");
   const [category, setCategory] = useState(searchParams.get("category") || "All");
   const [toast, setToast] = useState("");
+  const [sidebarOpen, setSidebarOpen] = useState(true);
 
   async function loadProducts() {
     setLoading(true);
@@ -44,6 +31,15 @@ export default function Shop({ cart, updateCart }) {
       setProducts(res.data);
     } finally {
       setLoading(false);
+    }
+  }
+
+  async function loadCategories() {
+    try {
+      const res = await axios.get(`${API}/products/categories`);
+      setCategories(res.data);
+    } catch {
+      // sidebar just shows "All" if this fails — not fatal
     }
   }
 
@@ -69,7 +65,13 @@ export default function Shop({ cart, updateCart }) {
 
   useEffect(() => {
     loadWishlist();
+    loadCategories();
   }, []);
+
+  // Separate, shorter-debounce fetch for the live preview dropdown —
+  // always searches across all categories so the preview shows every
+  // match, not just ones in the currently selected category.
+  // (Handled by the shared SearchPreview component below.)
 
   function addToCart(product) {
     const existing = cart.find((item) => item._id === product._id);
@@ -107,6 +109,8 @@ export default function Shop({ cart, updateCart }) {
     setTimeout(() => setToast(""), 2500);
   }
 
+  const allCategories = ["All", ...categories];
+
   return (
     <div className="container section">
       <div className="section-head">
@@ -116,80 +120,89 @@ export default function Shop({ cart, updateCart }) {
         </div>
       </div>
 
-      <div className="filter-bar">
-        <input
-          className="filter-search"
-          placeholder="Search components (ESP32, resistor, sensor...)"
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-        />
-      </div>
+      <button className="shop-sidebar-toggle" onClick={() => setSidebarOpen((v) => !v)}>
+        <span className="hamburger-icon"><span /><span /><span /></span>
+        Categories
+      </button>
 
-      <div className="pill-row" style={{ marginBottom: "24px" }}>
-        {CATEGORIES.map((c) => (
-          <button
-            key={c}
-            className={`pill ${category === c ? "active" : ""}`}
-            onClick={() => setCategory(c)}
-          >
-            {c}
-          </button>
-        ))}
-      </div>
+      <div className="shop-layout">
+        <aside className={`shop-sidebar ${sidebarOpen ? "" : "collapsed"}`}>
+          {allCategories.map((c) => (
+            <button
+              key={c}
+              className={`shop-sidebar-pill ${category === c ? "active" : ""}`}
+              onClick={() => setCategory(c)}
+            >
+              {c}
+            </button>
+          ))}
+        </aside>
 
-      {!loading && products.length === 0 && (
-        <p style={{ padding: "40px 0" }}>
-          No components match that search yet. Try a different term, or{" "}
-          <a href="https://wa.me/2349038899075" target="_blank" rel="noreferrer" style={{ color: "var(--signal-dark)", fontWeight: 600 }}>
-            ask us on WhatsApp
-          </a>.
-        </p>
-      )}
+        <div className="shop-main">
+          <div className="filter-bar">
+            <SearchPreview
+              value={search}
+              onChange={setSearch}
+              inputClassName="filter-search"
+              placeholder="Search components (ESP32, resistor, sensor...)"
+            />
+          </div>
 
-      <div className="product-grid">
-        {products.map((p) => {
-          const stock = stockInfo(p.stock);
-          const outOfStock = stock?.cls === "out";
-          const saved = wishlistIds.has(p._id);
+          {!loading && products.length === 0 && (
+            <p style={{ padding: "40px 0" }}>
+              No components match that search yet. Try a different term, or{" "}
+              <a href="https://wa.me/2349038899075" target="_blank" rel="noreferrer" style={{ color: "var(--signal-dark)", fontWeight: 600 }}>
+                ask us on WhatsApp
+              </a>.
+            </p>
+          )}
 
-          return (
-            <div key={p._id} className="product-card" onClick={() => navigate(`/product/${p._id}`)}>
-              <div className="product-card-img-wrap" style={{ position: "relative" }}>
-                <img
-                  loading="lazy"
-                  decoding="async"
-                  src={p.img || "https://via.placeholder.com/200"}
-                  alt={p.title}
-                  className="product-card-img"
-                  onError={(e) => (e.target.src = "https://via.placeholder.com/200")}
-                />
-                <button
-                  className="wishlist-toggle"
-                  aria-label={saved ? "Remove from wishlist" : "Save to wishlist"}
-                  onClick={(e) => toggleWishlist(e, p._id)}
-                >
-                  {saved ? "♥" : "♡"}
-                </button>
-              </div>
+          <div className="product-grid">
+            {products.map((p) => {
+              const stock = stockInfo(p.stock);
+              const outOfStock = stock?.cls === "out";
+              const saved = wishlistIds.has(p._id);
 
-              {p.sku && <div className="product-sku">{p.sku}</div>}
-              <div className="product-title">{p.title}</div>
-              <div className="product-price">₦{Number(p.price).toLocaleString()}</div>
-              {stock && <div className={`product-stock ${stock.cls}`}>{stock.label}</div>}
+              return (
+                <div key={p._id} className="product-card" onClick={() => navigate(`/product/${p._id}`)}>
+                  <div className="product-card-img-wrap" style={{ position: "relative" }}>
+                    <img
+                      loading="lazy"
+                      decoding="async"
+                      src={p.img || "https://via.placeholder.com/200"}
+                      alt={p.title}
+                      className="product-card-img"
+                      onError={(e) => (e.target.src = "https://via.placeholder.com/200")}
+                    />
+                    <button
+                      className="wishlist-toggle"
+                      aria-label={saved ? "Remove from wishlist" : "Save to wishlist"}
+                      onClick={(e) => toggleWishlist(e, p._id)}
+                    >
+                      {saved ? "♥" : "♡"}
+                    </button>
+                  </div>
 
-              <button
-                className="btn btn-dark btn-sm btn-block"
-                disabled={outOfStock}
-                onClick={(e) => {
-                  e.stopPropagation();
-                  addToCart(p);
-                }}
-              >
-                {outOfStock ? "Out of stock" : "Add to cart"}
-              </button>
-            </div>
-          );
-        })}
+                  {p.sku && <div className="product-sku">{p.sku}</div>}
+                  <div className="product-title">{p.title}</div>
+                  <div className="product-price">₦{Number(p.price).toLocaleString()}</div>
+                  {stock && <div className={`product-stock ${stock.cls}`}>{stock.label}</div>}
+
+                  <button
+                    className="btn btn-dark btn-sm btn-block"
+                    disabled={outOfStock}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      addToCart(p);
+                    }}
+                  >
+                    {outOfStock ? "Out of stock" : "Add to cart"}
+                  </button>
+                </div>
+              );
+            })}
+          </div>
+        </div>
       </div>
 
       {toast && <div className="toast">{toast}</div>}

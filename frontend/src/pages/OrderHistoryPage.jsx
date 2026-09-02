@@ -32,6 +32,9 @@ export default function OrderHistoryPage({ loadOrderIntoCart }) {
             id: o._id,
             date: new Date(o.createdAt).toLocaleString(),
             items: o.items,
+            subtotal: o.subtotal,
+            discountCode: o.discountCode,
+            discountAmount: o.discountAmount,
             total: o.total,
             status: o.status,
           }))
@@ -89,6 +92,12 @@ export default function OrderHistoryPage({ loadOrderIntoCart }) {
               <p style={{ margin: "2px 0 0", fontSize: "13px" }}>{order.date}</p>
             </div>
             <div style={{ textAlign: "right" }}>
+              {order.discountAmount > 0 && (
+                <p style={{ margin: 0, fontSize: "13px", color: "var(--signal-dark)" }}>
+                  {order.discountCode ? `${order.discountCode}: ` : "Discount: "}
+                  −₦{order.discountAmount.toLocaleString()}
+                </p>
+              )}
               <p style={{ margin: 0, fontWeight: 600 }}>₦{order.total.toLocaleString()}</p>
               {order.status && (
                 <span className="badge badge-new" style={{ marginTop: "4px", display: "inline-block" }}>

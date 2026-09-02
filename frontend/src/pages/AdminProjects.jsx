@@ -60,6 +60,13 @@ function ProjectsPanel() {
           <input placeholder="Title" value={newProject.title} onChange={(e) => setNewProject({ ...newProject, title: e.target.value })} />
           <input placeholder="Slug" value={newProject.slug} onChange={(e) => setNewProject({ ...newProject, slug: e.target.value })} />
         </div>
+        <input
+          placeholder="Card image URL (e.g. /project-art/my-project.svg or a hosted image URL)"
+          className="field-input"
+          style={{ marginTop: "10px" }}
+          value={newProject.image}
+          onChange={(e) => setNewProject({ ...newProject, image: e.target.value })}
+        />
         <textarea
           placeholder="Overview"
           className="field-input"
@@ -78,6 +85,13 @@ function ProjectsPanel() {
               <input defaultValue={p.title} onBlur={(e) => updateProject(p._id, "title", e.target.value)} />
               <input defaultValue={p.slug} onBlur={(e) => updateProject(p._id, "slug", e.target.value)} />
             </div>
+            <input
+              className="field-input"
+              style={{ marginTop: "10px" }}
+              placeholder="Card image URL"
+              defaultValue={p.image}
+              onBlur={(e) => updateProject(p._id, "image", e.target.value)}
+            />
             <textarea
               className="field-input"
               style={{ marginTop: "10px", minHeight: "60px" }}
@@ -96,6 +110,7 @@ function emptyProject() {
   return {
     title: "",
     slug: "",
+    image: "",
     overview: "",
     features: [],
     components: [],

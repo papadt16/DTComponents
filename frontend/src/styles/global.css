@@ -234,7 +234,7 @@ input, select, textarea {
   background: var(--ink);
   color: var(--text-on-dark);
   background-image:
-    linear-gradient(rgba(16, 56, 44, 0.65), rgba(11, 22, 19, 0.95)),
+    linear-gradient(rgba(11, 37, 68, 0.65), rgba(6, 11, 20, 0.95)),
     repeating-linear-gradient(0deg, rgba(255,255,255,0.035) 0px, rgba(255,255,255,0.035) 1px, transparent 1px, transparent 28px),
     repeating-linear-gradient(90deg, rgba(255,255,255,0.035) 0px, rgba(255,255,255,0.035) 1px, transparent 1px, transparent 28px);
 }
@@ -243,6 +243,7 @@ input, select, textarea {
   max-width: var(--max-width);
   margin: 0 auto;
   padding: var(--space-8) var(--space-5) var(--space-7);
+  position: relative;
 }
 
 .hero-eyebrow-row {
@@ -476,6 +477,194 @@ input, select, textarea {
   background: var(--ink);
   border-color: var(--ink);
   color: var(--text-on-dark);
+}
+
+/* ================= SHOP LAYOUT + COLLAPSIBLE CATEGORY SIDEBAR ================= */
+
+.shop-layout {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-6);
+}
+
+.shop-sidebar-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: 10px 14px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--panel);
+  font-size: var(--text-sm);
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: var(--space-4);
+}
+
+.shop-sidebar-toggle:hover {
+  border-color: var(--signal);
+  color: var(--signal-dark);
+}
+
+.hamburger-icon {
+  display: inline-flex;
+  flex-direction: column;
+  gap: 3px;
+  width: 16px;
+}
+
+.hamburger-icon span {
+  display: block;
+  height: 2px;
+  width: 100%;
+  background: currentColor;
+  border-radius: 1px;
+}
+
+.shop-sidebar {
+  width: 200px;
+  flex-shrink: 0;
+  position: sticky;
+  top: var(--space-4);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  overflow: hidden;
+  transition: width 0.2s ease, opacity 0.2s ease, margin 0.2s ease;
+}
+
+.shop-sidebar.collapsed {
+  width: 0;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.shop-sidebar-pill {
+  text-align: left;
+  padding: 10px 14px;
+  border-radius: var(--radius-sm);
+  border: 1px solid transparent;
+  background: transparent;
+  font-size: var(--text-sm);
+  font-weight: 500;
+  color: var(--text-muted);
+  white-space: nowrap;
+  transition: all 0.15s ease;
+}
+
+.shop-sidebar-pill:hover {
+  background: var(--copper-tint);
+  color: var(--text);
+}
+
+.shop-sidebar-pill.active {
+  background: var(--ink);
+  border-color: var(--ink);
+  color: var(--text-on-dark);
+}
+
+.shop-main {
+  flex: 1;
+  min-width: 0;
+}
+
+@media (max-width: 720px) {
+  .shop-sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100vh;
+    width: 240px;
+    background: var(--panel);
+    z-index: 200;
+    padding: var(--space-6) var(--space-4);
+    box-shadow: var(--shadow-panel);
+    overflow-y: auto;
+  }
+
+  .shop-sidebar.collapsed {
+    width: 240px;
+    transform: translateX(-100%);
+    opacity: 1;
+  }
+
+  .shop-sidebar-backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(6, 11, 20, 0.5);
+    z-index: 190;
+  }
+}
+
+/* ================= LIVE SEARCH PREVIEW ================= */
+
+.search-preview-wrap {
+  position: relative;
+  flex: 1;
+  min-width: 220px;
+}
+
+.search-preview-dropdown {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  right: 0;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-panel);
+  z-index: 50;
+  overflow: hidden;
+  max-height: 340px;
+  overflow-y: auto;
+}
+
+.search-preview-item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  width: 100%;
+  padding: var(--space-2) var(--space-3);
+  text-align: left;
+  border-bottom: 1px solid var(--border);
+}
+
+.search-preview-item:last-child {
+  border-bottom: none;
+}
+
+.search-preview-item:hover {
+  background: var(--copper-tint);
+}
+
+.search-preview-img {
+  width: 32px;
+  height: 32px;
+  object-fit: contain;
+  border-radius: var(--radius-sm);
+  background: var(--silkscreen-dim);
+  flex-shrink: 0;
+}
+
+.search-preview-title {
+  font-size: var(--text-sm);
+  font-weight: 500;
+  color: var(--text);
+}
+
+.search-preview-price {
+  margin-left: auto;
+  font-size: var(--text-sm);
+  color: var(--copper-dark);
+  font-weight: 600;
+  flex-shrink: 0;
+}
+
+.search-preview-empty {
+  padding: var(--space-4);
+  font-size: var(--text-sm);
+  color: var(--text-muted);
+  text-align: center;
 }
 
 /* ================= PRODUCT GRID / CARD ================= */
@@ -966,3 +1155,133 @@ input, select, textarea {
     padding: var(--space-6) 0;
   }
 }
+
+/* ================= HERO CIRCUIT ANIMATION ================= */
+
+.hero-circuit-panel {
+  position: absolute;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 340px;
+  height: 280px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.hero-circuit-label {
+  font-size: var(--text-xs);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-on-dark-muted);
+  text-align: center;
+}
+
+.hero-circuit-stage {
+  position: relative;
+  width: 100%;
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.hero-circuit-stage svg {
+  width: 88%;
+  height: 100%;
+}
+
+.hero-circuit-arrow {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  background: rgba(255, 255, 255, 0.06);
+  color: var(--text-on-dark);
+  font-size: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.15s ease;
+}
+
+.hero-circuit-arrow:hover {
+  background: var(--signal);
+  border-color: var(--signal);
+  color: var(--ink);
+}
+
+.hero-circuit-arrow.left { left: -6px; }
+.hero-circuit-arrow.right { right: -6px; }
+
+.hero-circuit-dots {
+  display: flex;
+  justify-content: center;
+  gap: 6px;
+}
+
+.hero-circuit-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.25);
+  transition: background 0.15s ease;
+}
+
+.hero-circuit-dot.active {
+  background: var(--copper);
+}
+
+@media (max-width: 1200px) {
+  .hero-circuit-panel {
+    display: none;
+  }
+}
+
+/* --- LED blink (555 timer astable) --- */
+@keyframes led-blink {
+  0%, 45% { opacity: 1; filter: drop-shadow(0 0 6px currentColor); }
+  50%, 95% { opacity: 0.15; filter: none; }
+  100% { opacity: 1; filter: drop-shadow(0 0 6px currentColor); }
+}
+.anim-led-blink { animation: led-blink 1.6s steps(1) infinite; color: #ff6b4a; }
+
+/* --- current flow along a wire --- */
+@keyframes flow-dash {
+  to { stroke-dashoffset: -24; }
+}
+.anim-flow { stroke-dasharray: 4 6; animation: flow-dash 0.6s linear infinite; }
+.anim-flow-slow { stroke-dasharray: 4 6; animation: flow-dash 1.4s linear infinite; }
+
+/* --- capacitor charge bar --- */
+@keyframes cap-charge {
+  0% { transform: scaleY(0.05); }
+  45% { transform: scaleY(1); }
+  55% { transform: scaleY(1); }
+  100% { transform: scaleY(0.05); }
+}
+.anim-cap-fill { animation: cap-charge 3s ease-in-out infinite; transform-origin: bottom; }
+
+/* --- astable two-LED alternating flasher --- */
+@keyframes flasher-a {
+  0%, 45% { opacity: 1; filter: drop-shadow(0 0 6px currentColor); }
+  50%, 100% { opacity: 0.15; filter: none; }
+}
+@keyframes flasher-b {
+  0%, 45% { opacity: 0.15; filter: none; }
+  50%, 100% { opacity: 1; filter: drop-shadow(0 0 6px currentColor); }
+}
+.anim-flasher-a { animation: flasher-a 1.8s steps(1) infinite; color: #ff6b4a; }
+.anim-flasher-b { animation: flasher-b 1.8s steps(1) infinite; color: #ffd166; }
+
+/* --- gentle pulse for IC chip body, sells "powered" feeling --- */
+@keyframes chip-pulse {
+  0%, 100% { opacity: 0.9; }
+  50% { opacity: 1; }
+}
+.anim-chip-pulse { animation: chip-pulse 2.4s ease-in-out infinite; }

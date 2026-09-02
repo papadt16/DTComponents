@@ -1,23 +1,23 @@
 :root {
-  /* ---- Color: drawn from the literal materials of a populated PCB ---- */
-  --ink: #0b1613;           /* shadowed circuit board */
-  --solder-mask: #10382c;   /* PCB substrate green */
-  --solder-mask-light: #164a3a;
+  /* ---- Color: a blue PCB under bench light, matching the brand mark ---- */
+  --ink: #060b14;           /* near-black, blue-shadowed board */
+  --solder-mask: #0b2544;   /* PCB substrate blue */
+  --solder-mask-light: #123a63;
   --silkscreen: #f6f5f0;    /* page background, matte off-white */
   --silkscreen-dim: #ece9e1;
   --panel: #ffffff;         /* card surfaces */
-  --copper: #c97a3d;        /* primary action / price / value */
+  --copper: #c97a3d;        /* metallic accent / price / value */
   --copper-dark: #a85f28;
   --copper-tint: #f3e2d2;
-  --signal: #1f9aa8;        /* interactive / navigation / links */
-  --signal-dark: #157480;
-  --signal-tint: #dcf1f2;
+  --signal: #17b3c9;        /* interactive / navigation / links — electric cyan-blue */
+  --signal-dark: #0e7c8c;
+  --signal-tint: #dcf3f5;
   --amber: #b8790a;         /* stock warnings, promo badges */
   --danger: #b3372c;
-  --text: #16211d;
-  --text-muted: #5b6b64;
-  --text-on-dark: #eef4f1;
-  --text-on-dark-muted: #9db3ab;
+  --text: #141b24;
+  --text-muted: #5b6570;
+  --text-on-dark: #eef1f5;
+  --text-on-dark-muted: #9bb0c4;
   --border: #ddd8cc;
   --border-strong: #c6bfae;
 

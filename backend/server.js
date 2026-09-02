@@ -23,7 +23,7 @@ import Product from "./models/Product.js";
 // ---------------------------
 const app = express();
 app.use(express.json());
-app.use(cors());
+app.use(cors({ origin: "https://dt-components.vercel.app" }));
 
 const PORT = process.env.PORT || 4000;
 const JWT_SECRET = process.env.JWT_SECRET;
@@ -147,6 +147,17 @@ app.get("/products", async (req, res) => {
 
   const products = await Product.find(filter);
   res.json(products);
+});
+
+// ---------------------------
+// DISTINCT CATEGORIES — powers the Shop sidebar. Reads straight from
+// whatever's actually in the database, so a category introduced via
+// CSV import (or the admin panel) shows up automatically with no code
+// change needed on the frontend.
+// ---------------------------
+app.get("/products/categories", async (req, res) => {
+  const categories = await Product.distinct("category");
+  res.json(categories.filter(Boolean).sort());
 });
 
 // ---------------------------

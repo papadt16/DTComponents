@@ -1,28 +1,135 @@
-import { useParams } from "react-router-dom";
+import { useParams, Link } from "react-router-dom";
 import { useState, useEffect } from "react";
-import API from "../utils/api";
+import axios from "axios";
+import API from "../utils/api.js";
 import { PrismLight as SyntaxHighlighter } from "react-syntax-highlighter";
 import c from "react-syntax-highlighter/dist/esm/languages/prism/c";
 import { oneDark } from "react-syntax-highlighter/dist/esm/styles/prism";
 
 SyntaxHighlighter.registerLanguage("c", c);
 
-export default function ProjectDetails() {
+const WHATSAPP_NUMBER = "2349038899075";
+
+// Component lines look like "2. BC547 Transistors (8 no)" or
+// "HC-SR04 Ultrasonic Sensor (2 no, one per compartment)" — strip the
+// leading numbering and any trailing quantity note so what's left is a
+// clean search term for the shop catalog. A leading digit inside the
+// parens is what distinguishes a quantity note ("(8 no)") from a
+// meaningful part of the name ("(I2C)"), which we want to keep.
+function cleanComponentName(raw) {
+  return raw
+    .replace(/^\d+\.\s*/, "")
+    .replace(/\s*\(\d+[^)]*\)\s*$/, "")
+    .trim();
+}
+
+async function findMatchingProduct(cleanedName) {
+  const words = cleanedName.split(/\s+/).filter(Boolean);
+  const attempts = [cleanedName, words.slice(0, 2).join(" "), words[0]].filter(Boolean);
+
+  for (const term of attempts) {
+    try {
+      const res = await axios.get(`${API}/products`, { params: { search: term } });
+      if (res.data.length > 0) return res.data[0];
+    } catch {
+      // network hiccup on this attempt — try the next, shorter term
+    }
+  }
+  return null;
+}
+
+export default function ProjectDetails({ cart, updateCart }) {
   const { slug } = useParams();
   const [project, setProject] = useState(null);
-  const [error, setError] = useState("");
+  const [notFound, setNotFound] = useState(false);
+  const [itemStatus, setItemStatus] = useState({}); // index -> "added" | "not-found" | "checking"
+  const [bulkStatus, setBulkStatus] = useState("");
 
-useEffect(() => {
-  const data = projects[slug];
-  if (data) {
-    setProject(data);
-  } else {
+  useEffect(() => {
     setProject(null);
-  }
-}, [slug]);
+    setNotFound(false);
+    setItemStatus({});
+    setBulkStatus("");
 
-  if (error) {
-    return <p style={{ padding: 40 }}>{error}</p>;
+    axios
+      .get(`${API}/projects/${slug}`)
+      .then((res) => setProject(res.data))
+      .catch(() => setNotFound(true));
+  }, [slug]);
+
+  function addProductToCart(product, cartSnapshot = cart) {
+    const existing = cartSnapshot.find((item) => item._id === product._id);
+    let next;
+    if (existing) {
+      next = cartSnapshot.map((item) => (item._id === product._id ? { ...item, qty: item.qty + 1 } : item));
+    } else {
+      next = [...cartSnapshot, { _id: product._id, title: product.title, price: product.price, img: product.img, qty: 1 }];
+    }
+    updateCart(next);
+    return next;
+  }
+
+  async function handleAddComponent(rawText, index) {
+    setItemStatus((s) => ({ ...s, [index]: "checking" }));
+    const product = await findMatchingProduct(cleanComponentName(rawText));
+    if (product) {
+      addProductToCart(product);
+      setItemStatus((s) => ({ ...s, [index]: "added" }));
+    } else {
+      setItemStatus((s) => ({ ...s, [index]: "not-found" }));
+    }
+  }
+
+  async function handleAddAllComponents() {
+    setBulkStatus("Checking components…");
+    let addedCount = 0;
+    const missing = [];
+    const nextStatus = {};
+    // Accumulate locally across the loop instead of relying on `cart`
+    // state — updateCart calls are async, so reading `cart` again on the
+    // next iteration would still see the stale pre-loop value and each
+    // call would clobber the previous addition instead of stacking.
+    let cartDraft = cart;
+
+    for (let i = 0; i < project.components.length; i++) {
+      const raw = project.components[i];
+      const product = await findMatchingProduct(cleanComponentName(raw));
+      if (product) {
+        cartDraft = addProductToCart(product, cartDraft);
+        nextStatus[i] = "added";
+        addedCount++;
+      } else {
+        nextStatus[i] = "not-found";
+        missing.push(cleanComponentName(raw));
+      }
+    }
+
+    setItemStatus(nextStatus);
+
+    if (missing.length === 0) {
+      setBulkStatus(`All ${addedCount} components added to cart.`);
+    } else {
+      setBulkStatus(
+        `${addedCount} of ${project.components.length} components added to cart. ${missing.length} not currently stocked — message us on WhatsApp for those.`
+      );
+    }
+  }
+
+  function whatsappLinkFor(componentName) {
+    const msg = `Hi DTComponents, do you have this in stock: ${componentName}? (For the "${project?.title}" project)`;
+    return `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(msg)}`;
+  }
+
+  if (notFound) {
+    return (
+      <div style={page}>
+        <h1 style={title}>Project not found</h1>
+        <p>This build may have been removed or renamed.</p>
+        <Link to="/" className="btn btn-secondary" style={{ marginTop: 16, display: "inline-block" }}>
+          Back to home
+        </Link>
+      </div>
+    );
   }
 
   if (!project) {
@@ -32,549 +139,89 @@ useEffect(() => {
   return (
     <div style={page}>
       <h1 style={title}>{project.title}</h1>
+      {project.difficulty && <p style={difficultyBadge}>{project.difficulty}</p>}
 
       <Section title="Overview">
         <p>{project.overview}</p>
       </Section>
 
-      <Section title="Key Features">
-        <ul>
-          {project.features?.map((f, i) => (
-            <li key={i}>{f}</li>
-          ))}
-        </ul>
-      </Section>
-
-      <Section title="Components Required">
-        <ul>
-          {project.components?.map((c, i) => (
-            <li key={i}>{c}</li>
-          ))}
-        </ul>
-      </Section>
-
-      <Section title="Schematic Diagram">
-        <img src={project.schematic} alt="schematic" style={image} />
-      </Section>
-
-      <Section title="Source Code">
-  <SyntaxHighlighter
-    language="c"
-    style={oneDark}
-    customStyle={{
-      borderRadius: "8px",
-      fontSize: "14px",
-      padding: "20px",
-    }}
-  >
-    {project.code}
-  </SyntaxHighlighter>
-</Section>
-
-
-    {/* EXPLANATION */}
-<Section title="Explanation">
-  {project.explanation.map((step, i) => (
-    <div key={i} style={explanationBlock}>
-      
-      {/* STEP TITLE */}
-      <h3 style={stepTitle}>{step.title}</h3>
-
-      {/* IMAGE (if present) */}
-      {step.img && (
-        <img
-          src={step.img}
-          alt={step.title}
-          style={explanationImage}
-        />
+      {project.features?.length > 0 && (
+        <Section title="Key Features">
+          <ul>
+            {project.features.map((f, i) => (
+              <li key={i}>{f}</li>
+            ))}
+          </ul>
+        </Section>
       )}
 
-      {/* TEXT */}
-      {Array.isArray(step.text) ? (
-        step.text.map((line, j) => (
-          <p key={j} style={explanationText}>{line}</p>
-        ))
-      ) : (
-        <p style={explanationText}>{step.text}</p>
+      {project.components?.length > 0 && (
+        <Section title="Components Required">
+          <button className="btn btn-primary btn-sm" onClick={handleAddAllComponents} style={{ marginBottom: 14 }}>
+            Add all available components to cart
+          </button>
+          {bulkStatus && <p style={bulkStatusText}>{bulkStatus}</p>}
+
+          <ul style={{ listStyle: "none", padding: 0 }}>
+            {project.components.map((comp, i) => (
+              <li key={i} style={componentRow}>
+                <span>{comp}</span>
+                {itemStatus[i] === "added" && <span style={{ color: "var(--signal-dark)", fontSize: 13, fontWeight: 600 }}>Added ✓</span>}
+                {itemStatus[i] === "checking" && <span style={{ color: "var(--text-muted)", fontSize: 13 }}>Checking…</span>}
+                {itemStatus[i] === "not-found" && (
+                  <a href={whatsappLinkFor(cleanComponentName(comp))} target="_blank" rel="noreferrer" style={{ fontSize: 13, color: "var(--danger)", fontWeight: 600 }}>
+                    Not in stock — ask on WhatsApp
+                  </a>
+                )}
+                {!itemStatus[i] && (
+                  <button className="btn btn-secondary btn-sm" onClick={() => handleAddComponent(comp, i)}>
+                    Add to cart
+                  </button>
+                )}
+              </li>
+            ))}
+          </ul>
+        </Section>
       )}
-    </div>
-  ))}
-</Section>
+
+      {project.schematic && (
+        <Section title="Schematic Diagram">
+          <img src={project.schematic} alt="schematic" style={image} />
+        </Section>
+      )}
+
+      {project.code && (
+        <Section title="Source Code">
+          <SyntaxHighlighter
+            language="c"
+            style={oneDark}
+            customStyle={{ borderRadius: "8px", fontSize: "14px", padding: "20px" }}
+          >
+            {project.code}
+          </SyntaxHighlighter>
+        </Section>
+      )}
+
+      {project.explanation?.length > 0 && (
+        <Section title="Explanation">
+          {project.explanation.map((step, i) => (
+            <div key={i} style={explanationBlock}>
+              <h3 style={stepTitle}>{step.title}</h3>
+              {step.img && <img src={step.img} alt={step.title} style={explanationImage} />}
+              {Array.isArray(step.text) ? (
+                step.text.map((line, j) => (
+                  <p key={j} style={explanationText}>{line}</p>
+                ))
+              ) : (
+                <p style={explanationText}>{step.text}</p>
+              )}
+            </div>
+          ))}
+        </Section>
+      )}
     </div>
   );
 }
- 
-const projects = {
-  "smart-home-automation": {
-    title: "Smart Home Automation",
-    overview:
-      "In this IoT project, I have shown how to make IoT based Smart Home Automation Using Blynk & ESP32 to control an 8-channel relay module from the manual switch & smartphone using the Blynk App. If the internet is not available, then you can control the home appliances from manual switches. During the article, I have shown all the steps to make this home automation system.",
-    features: [
-      "1. Control home appliances with WiFi (Blynk App)",
-
-      "2. Control home appliances with manual switches.",
-
-      "3. Monitor real-time feedback in the Blynk App.",
-
-      "4. Control home appliances manually without internet.",
-
-      "You need just an 8-channel relay module & ESP32 board to make this smart home project.",
-    ],
-    components: [
-      "1. Relays 5v (SPDT) (8 no)",
-      "2. BC547 Transistors (8 no)",
-      "3. PC817 Optocuplors (8 no)",
-      "4. 510-ohm 0.25-watt Resistor (8 no) (R1 - R8)",
-      "5. 1k 0.25-watt Resistors (10 no) (R9 - R18)",
-      "6. LED 5-mm (10 no)",
-      "7. 1N4007 Diodes (8 no) (D1 - D8)",
-      "8. Push Buttons (8 no)",
-      "9. Terminal Connectors",
-      "10. 5V DC supply",
-    ],
-    schematic:
-      "https://content.instructables.com/FDR/A47B/KJEAG18Y/FDRA47BKJEAG18Y.jpg?auto=webp&frame=1&width=1024&height=1024&fit=bounds&md=MjAyMS0wMS0wMSAyMDowNDo0Ni4w",
-    code: `
-/*************************************************************
-  Update the Preferences –> Aditional boards Manager URLs: 
-  https://dl.espressif.com/dl/package_esp32_index.json, http://arduino.esp8266.com/stable/package_esp8266com_index.json
-  
-  Note: This requires ESP32 support package:
-    https://github.com/espressif/arduino-esp32
-    
-  Download latest Blynk library here:
-    https://github.com/blynkkk/blynk-library/releases/latest
-
- *************************************************************
-  
-  Change WiFi ssid, pass, and Blynk auth token to run :)
-  
-  Please be sure to select the right ESP32 module
-  in the Tools -> Board menu!
-
- *************************************************************/
-
-#include <BlynkSimpleEsp32.h>
-
-BlynkTimer timer;
-
-// define the GPIO connected with Relays and switches
-#define RelayPin1 23  //D23
-#define RelayPin2 22  //D22
-#define RelayPin3 21  //D21
-#define RelayPin4 19  //D19
-#define RelayPin5 18  //D18
-#define RelayPin6 5   //D5
-#define RelayPin7 25  //D25
-#define RelayPin8 26  //D26
-
-#define SwitchPin1 13  //D13
-#define SwitchPin2 12  //D12
-#define SwitchPin3 14  //D14
-#define SwitchPin4 27  //D27
-#define SwitchPin5 33  //D33
-#define SwitchPin6 32  //D32
-#define SwitchPin7 15  //D15
-#define SwitchPin8 4   //D4
-
-#define wifiLed    2   //D2
-
-#define VPIN_BUTTON_1    V1 
-#define VPIN_BUTTON_2    V2
-#define VPIN_BUTTON_3    V3 
-#define VPIN_BUTTON_4    V4
-#define VPIN_BUTTON_5    V5 
-#define VPIN_BUTTON_6    V6
-#define VPIN_BUTTON_7    V7 
-#define VPIN_BUTTON_8    V8
-
-int toggleState_1 = 1; //Define integer to remember the toggle state for relay 1
-int toggleState_2 = 1; //Define integer to remember the toggle state for relay 2
-int toggleState_3 = 1; //Define integer to remember the toggle state for relay 3
-int toggleState_4 = 1; //Define integer to remember the toggle state for relay 4
-int toggleState_5 = 1; //Define integer to remember the toggle state for relay 5
-int toggleState_6 = 1; //Define integer to remember the toggle state for relay 6
-int toggleState_7 = 1; //Define integer to remember the toggle state for relay 7
-int toggleState_8 = 1; //Define integer to remember the toggle state for relay 8
-
-int wifiFlag = 0;
-
-#define AUTH "AUTH TOKEN"                 // You should get Auth Token in the Blynk App.  
-#define WIFI_SSID "WIFI NAME"             //Enter Wifi Name
-#define WIFI_PASS "WIFI PASSWORD"         //Enter wifi Password
-
-
-void relayOnOff(int relay){
-
-    switch(relay){
-      case 1: 
-             if(toggleState_1 == 1){
-              digitalWrite(RelayPin1, LOW); // turn on relay 1
-              toggleState_1 = 0;
-              Serial.println("Device1 ON");
-              }
-             else{
-              digitalWrite(RelayPin1, HIGH); // turn off relay 1
-              toggleState_1 = 1;
-              Serial.println("Device1 OFF");
-              }
-             delay(100);
-      break;
-      case 2: 
-             if(toggleState_2 == 1){
-              digitalWrite(RelayPin2, LOW); // turn on relay 2
-              toggleState_2 = 0;
-              Serial.println("Device2 ON");
-              }
-             else{
-              digitalWrite(RelayPin2, HIGH); // turn off relay 2
-              toggleState_2 = 1;
-              Serial.println("Device2 OFF");
-              }
-             delay(100);
-      break;
-      case 3: 
-             if(toggleState_3 == 1){
-              digitalWrite(RelayPin3, LOW); // turn on relay 3
-              toggleState_3 = 0;
-              Serial.println("Device3 ON");
-              }
-             else{
-              digitalWrite(RelayPin3, HIGH); // turn off relay 3
-              toggleState_3 = 1;
-              Serial.println("Device3 OFF");
-              }
-             delay(100);
-      break;
-      case 4: 
-             if(toggleState_4 == 1){
-              digitalWrite(RelayPin4, LOW); // turn on relay 4
-              toggleState_4 = 0;
-              Serial.println("Device4 ON");
-              }
-             else{
-              digitalWrite(RelayPin4, HIGH); // turn off relay 4
-              toggleState_4 = 1;
-              Serial.println("Device4 OFF");
-              }
-             delay(100);
-      break;
-      case 5: 
-             if(toggleState_5 == 1){
-              digitalWrite(RelayPin5, LOW); // turn on relay 5
-              toggleState_5 = 0;
-              Serial.println("Device5 ON");
-              }
-             else{
-              digitalWrite(RelayPin5, HIGH); // turn off relay 5
-              toggleState_5 = 1;
-              Serial.println("Device5 OFF");
-              }
-             delay(100);
-      break;
-      case 6: 
-             if(toggleState_6 == 1){
-              digitalWrite(RelayPin6, LOW); // turn on relay 6
-              toggleState_6 = 0;
-              Serial.println("Device6 ON");
-              }
-             else{
-              digitalWrite(RelayPin6, HIGH); // turn off relay 6
-              toggleState_6 = 1;
-              Serial.println("Device6 OFF");
-              }
-             delay(100);
-      break;
-      case 7: 
-             if(toggleState_7 == 1){
-              digitalWrite(RelayPin7, LOW); // turn on relay 7
-              toggleState_7 = 0;
-              Serial.println("Device7 ON");
-              }
-             else{
-              digitalWrite(RelayPin7, HIGH); // turn off relay 7
-              toggleState_7 = 1;
-              Serial.println("Device7 OFF");
-              }
-             delay(100);
-      break;
-      case 8: 
-             if(toggleState_8 == 1){
-              digitalWrite(RelayPin8, LOW); // turn on relay 8
-              toggleState_8 = 0;
-              Serial.println("Device8 ON");
-              }
-             else{
-              digitalWrite(RelayPin8, HIGH); // turn off relay 8
-              toggleState_8 = 1;
-              Serial.println("Device8 OFF");
-              }
-             delay(100);
-      break;
-      default : break;      
-      }  
-}
-
-void with_internet(){
-    //Manual Switch Control
-    if (digitalRead(SwitchPin1) == LOW){
-      delay(200);
-      relayOnOff(1); 
-      Blynk.virtualWrite(VPIN_BUTTON_1, toggleState_1);   // Update Button Widget  
-    }
-    else if (digitalRead(SwitchPin2) == LOW){
-      delay(200);
-      relayOnOff(2);      
-      Blynk.virtualWrite(VPIN_BUTTON_2, toggleState_2);   // Update Button Widget
-    }
-    else if (digitalRead(SwitchPin3) == LOW){
-      delay(200);
-      relayOnOff(3);
-      Blynk.virtualWrite(VPIN_BUTTON_3, toggleState_3);   // Update Button Widget
-    }
-    else if (digitalRead(SwitchPin4) == LOW){
-      delay(200);
-      relayOnOff(4);
-      Blynk.virtualWrite(VPIN_BUTTON_4, toggleState_4);   // Update Button Widget
-    }
-    else if (digitalRead(SwitchPin5) == LOW){
-      delay(200);
-      relayOnOff(5); 
-      Blynk.virtualWrite(VPIN_BUTTON_5, toggleState_5);   // Update Button Widget  
-    }
-    else if (digitalRead(SwitchPin6) == LOW){
-      delay(200);
-      relayOnOff(6);      
-      Blynk.virtualWrite(VPIN_BUTTON_6, toggleState_6);   // Update Button Widget
-    }
-    else if (digitalRead(SwitchPin7) == LOW){
-      delay(200);
-      relayOnOff(7);
-      Blynk.virtualWrite(VPIN_BUTTON_7, toggleState_7);   // Update Button Widget
-    }
-    else if (digitalRead(SwitchPin8) == LOW){
-      delay(200);
-      relayOnOff(8);
-      Blynk.virtualWrite(VPIN_BUTTON_8, toggleState_8);   // Update Button Widget
-    }
-}
-void without_internet(){
-    //Manual Switch Control
-    if (digitalRead(SwitchPin1) == LOW){
-      delay(200);
-      relayOnOff(1);      
-    }
-    else if (digitalRead(SwitchPin2) == LOW){
-      delay(200);
-      relayOnOff(2);
-    }
-    else if (digitalRead(SwitchPin3) == LOW){
-      delay(200);
-      relayOnOff(3);
-    }
-    else if (digitalRead(SwitchPin4) == LOW){
-      delay(200);
-      relayOnOff(4);
-    }
-    else if (digitalRead(SwitchPin5) == LOW){
-      delay(200);
-      relayOnOff(5);      
-    }
-    else if (digitalRead(SwitchPin6) == LOW){
-      delay(200);
-      relayOnOff(6);
-    }
-    else if (digitalRead(SwitchPin7) == LOW){
-      delay(200);
-      relayOnOff(7);
-    }
-    else if (digitalRead(SwitchPin8) == LOW){
-      delay(200);
-      relayOnOff(8);
-    }
-}
-
-BLYNK_CONNECTED() {
-  // Request the latest state from the server
-  Blynk.syncVirtual(VPIN_BUTTON_1);
-  Blynk.syncVirtual(VPIN_BUTTON_2);
-  Blynk.syncVirtual(VPIN_BUTTON_3);
-  Blynk.syncVirtual(VPIN_BUTTON_4);
-  Blynk.syncVirtual(VPIN_BUTTON_5);
-  Blynk.syncVirtual(VPIN_BUTTON_6);
-  Blynk.syncVirtual(VPIN_BUTTON_7);
-  Blynk.syncVirtual(VPIN_BUTTON_8);
-}
-
-// When App button is pushed - switch the state
-
-BLYNK_WRITE(VPIN_BUTTON_1) {
-  toggleState_1 = param.asInt();
-  digitalWrite(RelayPin1, toggleState_1);
-}
-
-BLYNK_WRITE(VPIN_BUTTON_2) {
-  toggleState_2 = param.asInt();
-  digitalWrite(RelayPin2, toggleState_2);
-}
-
-BLYNK_WRITE(VPIN_BUTTON_3) {
-  toggleState_3 = param.asInt();
-  digitalWrite(RelayPin3, toggleState_3);
-}
-
-BLYNK_WRITE(VPIN_BUTTON_4) {
-  toggleState_4 = param.asInt();
-  digitalWrite(RelayPin4, toggleState_4);
-}
-
-BLYNK_WRITE(VPIN_BUTTON_5) {
-  toggleState_5 = param.asInt();
-  digitalWrite(RelayPin5, toggleState_5);
-}
-
-BLYNK_WRITE(VPIN_BUTTON_6) {
-  toggleState_6 = param.asInt();
-  digitalWrite(RelayPin6, toggleState_6);
-}
-
-BLYNK_WRITE(VPIN_BUTTON_7) {
-  toggleState_7 = param.asInt();
-  digitalWrite(RelayPin7, toggleState_7);
-}
-
-BLYNK_WRITE(VPIN_BUTTON_8) {
-  toggleState_8 = param.asInt();
-  digitalWrite(RelayPin8, toggleState_8);
-}
-
-
-void checkBlynkStatus() { // called every 3 seconds by SimpleTimer
-
-  bool isconnected = Blynk.connected();
-  if (isconnected == false) {
-    wifiFlag = 1;
-    digitalWrite(wifiLed, LOW); //Turn off WiFi LED
-  }
-  if (isconnected == true) {
-    wifiFlag = 0;
-    digitalWrite(wifiLed, HIGH); //Turn on WiFi LED
-  }
-}
-void setup()
-{
-  Serial.begin(9600);
-
-  pinMode(RelayPin1, OUTPUT);
-  pinMode(RelayPin2, OUTPUT);
-  pinMode(RelayPin3, OUTPUT);
-  pinMode(RelayPin4, OUTPUT);
-  pinMode(RelayPin5, OUTPUT);
-  pinMode(RelayPin6, OUTPUT);
-  pinMode(RelayPin7, OUTPUT);
-  pinMode(RelayPin8, OUTPUT);
-
-  pinMode(wifiLed, OUTPUT);
-
-  pinMode(SwitchPin1, INPUT_PULLUP);
-  pinMode(SwitchPin2, INPUT_PULLUP);
-  pinMode(SwitchPin3, INPUT_PULLUP);
-  pinMode(SwitchPin4, INPUT_PULLUP);
-  pinMode(SwitchPin5, INPUT_PULLUP);
-  pinMode(SwitchPin6, INPUT_PULLUP);
-  pinMode(SwitchPin7, INPUT_PULLUP);
-  pinMode(SwitchPin8, INPUT_PULLUP);
-
-  //During Starting all Relays should TURN OFF
-  digitalWrite(RelayPin1, toggleState_1);
-  digitalWrite(RelayPin2, toggleState_2);
-  digitalWrite(RelayPin3, toggleState_3);
-  digitalWrite(RelayPin4, toggleState_4);
-  digitalWrite(RelayPin5, toggleState_5);
-  digitalWrite(RelayPin6, toggleState_6);
-  digitalWrite(RelayPin7, toggleState_7);
-  digitalWrite(RelayPin8, toggleState_8);
-
-  WiFi.begin(WIFI_SSID, WIFI_PASS);
-  timer.setInterval(3000L, checkBlynkStatus); // check if Blynk server is connected every 3 seconds
-  Blynk.config(AUTH);
-}
-
-void loop()
-{  
-  if (WiFi.status() != WL_CONNECTED)
-  {
-    Serial.println("WiFi Not Connected");
-  }
-  else
-  {
-    Serial.println("WiFi Connected");
-    Blynk.run();
-  }
-
-  timer.run(); // Initiates SimpleTimer
-  if (wifiFlag == 0)
-    with_internet();
-  else
-    without_internet();
-}
-`,
-    explanation: [
-      {title: "Step 1: Circuit Diagram of the ESP32 Project",
-      
-      text: [
-      "The circuit is very simple, I have used the GPIO pins D23, D22, D21, D19, D18, D5, D25 & D26 to control the 8 relays.",
-      "And the GPIO pins D13, D12, D14, D27, D33, D32, D15 & D4 connected with push buttons to control the 8 relays manually.",
-      "I have used the INPUT_PULLUP function in Arduino IDE instead of using the pull-up resistors.",
-      "I have used a 5V mobile charger to supply the smart relay module.",
-        ],
-      },
-      
-      {title: "Step 2: Control Relays With Internet Using Blynk",
-      
-      text: "If the ESP32 module is connected with the WiFi, then you can control the home appliances from Blynk App and push-buttons. You can control, monitor the real-time status of the relays from anywhere in the world with the Blynk App.",
-        },
-
-      {title: "Step 3: Control Relays Without Internet Using Push-buttons",
-
-      text: [
-      "If the WiFi is not available, you can control the relays from the pushbuttons.",
-
-      "The ESP32 will check for the WiFi after every 3 seconds. When the WiFi is available, the ESP32 will automatically connect with the WiFi.",
-      ],
-      },
-      
-      {title: "Step 4: Configure the Blynk App for the ESP32",
-      img: "https://content.instructables.com/FN2/L5IA/KJEAG18W/FN2L5IAKJEAG18W.jpg?auto=webp&frame=1&width=1024&height=1024&fit=bounds&md=MjAyMS0wMS0wMSAyMDowNDo0MS4w&_gl=1*3ddldx*_ga*MjA0MjU1MTc3Ni4xNzY2MTc3OTI1*_ga_NZSJ72N6RX*czE3NjYxNzc5MjckbzEkZzEkdDE3NjYxNzc5MjckajYwJGwwJGgw",
-      text: [
-      "1. Install the Blynk App from the Google play store or App store. Then create an account and tap on the New Project.",
-
-      "2. Give the name to the project, select ESP32 Dev Board, Connection type will be WiFi. Then tap on Create.",
-
-      "3. Blynk will send an authentication token to the registered email id. Tap on OK.",
-      ],
-      },
-      
-      {title: "Step 5: Add the Button Widgets in Blynk App",
-      img: "https://content.instructables.com/F9K/QW43/KJEAG18V/F9KQW43KJEAG18V.jpg?auto=webp&frame=1&width=1024&height=1024&fit=bounds&md=MjAyMS0wMS0wMSAyMDowNDozOC4w",
-      text: "Then add 8 button widgets to control the 8 relays. Here I have used virtual pins V1, V2, V3, V4, V5, V6, V7, V8 for 8 buttons. And mode will be Switch.",
-      },
-      
-      {title: "Step 6: Code for Blynk ESP32 Home Automation",
-      img: "https://content.instructables.com/FX1/CL1G/KJEAG19S/FX1CL1GKJEAG19S.jpg?auto=webp&frame=1&width=1024&height=1024&fit=bounds&md=MjAyMS0wMS0wMSAyMDowNToxOC4w&_gl=1*z5m73n*_ga*MjA0MjU1MTc3Ni4xNzY2MTc3OTI1*_ga_NZSJ72N6RX*czE3NjYyMzA5MjMkbzMkZzEkdDE3NjYyMzA5MjMkajYwJGwwJGgw",
-      text: [
-      "Before uploading the code you have to install the ESP32 board and Blynk library.",
-
-      "Then enter the WiFi name, WiFi password & Blynk Auth Token in the code.",
-
-      "Select the DOIT ESP32 DEVKIT V1 board and proper PORT.",
-
-      "Then upload the code to ESP32 Board.",
-        ],
-      },
-    ],
-  },
-};
 
 /* ===== REUSABLE SECTION ===== */
 
@@ -601,6 +248,17 @@ const title = {
   fontWeight: "bold",
 };
 
+const difficultyBadge = {
+  display: "inline-block",
+  marginTop: 8,
+  padding: "4px 12px",
+  borderRadius: "999px",
+  background: "var(--copper-tint)",
+  color: "var(--copper-dark)",
+  fontSize: "13px",
+  fontWeight: 600,
+};
+
 const sectionTitle = {
   fontSize: "22px",
   marginBottom: 10,
@@ -614,12 +272,19 @@ const image = {
   marginTop: 10,
 };
 
-const codeBox = {
-  background: "#020617",
-  padding: "20px",
-  borderRadius: "8px",
-  overflowX: "auto",
+const componentRow = {
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "space-between",
+  gap: "12px",
+  padding: "10px 0",
+  borderBottom: "1px solid #e5e5e5",
+};
+
+const bulkStatusText = {
   fontSize: "14px",
+  color: "#444",
+  marginBottom: "12px",
 };
 
 const explanationBlock = {
@@ -640,8 +305,7 @@ const explanationImage = {
 };
 
 const explanationText = {
-  marginBottom: "18px", 
+  marginBottom: "18px",
   lineHeight: "1.7",
   color: "black",
 };
-

@@ -1,10 +1,9 @@
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 import axios from "axios";
-import jsPDF from "jspdf";
-import autoTable from "jspdf-autotable";
 import API from "../utils/api.js";
 import { authHeaders, isLoggedIn } from "../utils/auth.js";
+import { buildBoqPdf, sharePdfToWhatsApp, fetchCustomerContact } from "../utils/boq.js";
 
 const WHATSAPP_NUMBER = "2349038899075";
 
@@ -84,63 +83,30 @@ export default function CartPage({ cart, updateCart }) {
       console.error("Order save failed, continuing with PDF/WhatsApp checkout:", err);
     }
 
-    generatePdfAndSendWhatsApp();
+    await generatePdfAndSendWhatsApp();
     setPlacing(false);
   };
 
-  const generatePdfAndSendWhatsApp = () => {
-    const doc = new jsPDF();
-    doc.setFontSize(16);
-    doc.text("DTComponents", 105, 15, { align: "center" });
-    doc.setFontSize(12);
-    doc.text("Bill of Quantities (BOQ)", 105, 22, { align: "center" });
-    doc.setFontSize(10);
-    doc.text(`Date: ${new Date().toLocaleDateString()}`, 14, 30);
+  const generatePdfAndSendWhatsApp = async () => {
+    const contact = await fetchCustomerContact();
 
-    const tableBody = cart.map((item, index) => [
-      index + 1,
-      item.title,
-      item.qty,
-      item.price.toLocaleString(),
-      (item.qty * item.price).toLocaleString(),
-    ]);
-
-    autoTable(doc, {
-      startY: 40,
-      head: [["S/N", "Description", "Qty", "Unit (NGN)", "Amount (NGN)"]],
-      body: tableBody,
-      styles: { fontSize: 10, cellPadding: 3 },
-      headStyles: { fillColor: [16, 56, 44], textColor: 255 },
-      columnStyles: {
-        0: { cellWidth: 12 },
-        1: { cellWidth: 80 },
-        2: { cellWidth: 15 },
-        3: { cellWidth: 30 },
-        4: { cellWidth: 30 },
-      },
+    const doc = buildBoqPdf({
+      items: cart,
+      subtotal: subtotal(),
+      discount: promo ? { code: promo.code, amount: promo.discountAmount } : null,
+      total: total(),
+      date: new Date().toLocaleDateString(),
+      contact,
     });
 
-    let finalY = doc.lastAutoTable.finalY + 10;
-    doc.setFontSize(11);
-    doc.text(`Subtotal: NGN ${subtotal().toLocaleString()}`, 195, finalY, { align: "right" });
-
-    if (promo) {
-      finalY += 7;
-      doc.text(`Discount (${promo.code}): -NGN ${promo.discountAmount.toLocaleString()}`, 195, finalY, { align: "right" });
-    }
-
-    finalY += 8;
-    doc.setFontSize(12);
-    doc.text(`Grand Total: NGN ${total().toLocaleString()}`, 195, finalY, { align: "right" });
-    doc.save("DTComponents_BOQ.pdf");
-
-    let msg = "Hello DTComponents,%0A%0APlease find my BOQ.%0A%0AOrder Summary:%0A";
+    let msg = "Hello DTComponents,\n\nPlease find my BOQ attached.\n\nOrder Summary:\n";
     cart.forEach((p) => {
-      msg += `- ${p.qty} x ${p.title}%0A`;
+      msg += `- ${p.qty} x ${p.title}\n`;
     });
-    if (promo) msg += `%0ADiscount (${promo.code}): -NGN ${promo.discountAmount.toLocaleString()}%0A`;
-    msg += `%0AGrand Total: NGN ${total().toLocaleString()}%0A%0AThank you.`;
-    window.open(`https://wa.me/${WHATSAPP_NUMBER}?text=${msg}`, "_blank");
+    if (promo) msg += `\nDiscount (${promo.code}): -NGN ${promo.discountAmount.toLocaleString()}\n`;
+    msg += `\nGrand Total: NGN ${total().toLocaleString()}\n\nThank you.`;
+
+    await sharePdfToWhatsApp({ doc, filename: "DTComponents_BOQ.pdf", message: msg, whatsappNumber: WHATSAPP_NUMBER });
 
     // Always keep a local copy too, so "View Order History" works
     // instantly even before the backend round-trip / for guests.
@@ -149,6 +115,9 @@ export default function CartPage({ cart, updateCart }) {
       id: Date.now(),
       date: new Date().toLocaleString(),
       items: cart.map((i) => ({ ...i })),
+      subtotal: subtotal(),
+      discountCode: promo?.code,
+      discountAmount: promo?.discountAmount || 0,
       total: total(),
     });
     localStorage.setItem("dt_order_history", JSON.stringify(history));

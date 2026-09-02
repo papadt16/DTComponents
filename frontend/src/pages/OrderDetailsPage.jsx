@@ -1,9 +1,9 @@
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
-import jsPDF from "jspdf";
 import API from "../utils/api.js";
 import { authHeaders, isLoggedIn } from "../utils/auth.js";
+import { buildBoqPdf, sharePdfToWhatsApp, fetchCustomerContact } from "../utils/boq.js";
 
 const WHATSAPP_NUMBER = "2349038899075";
 const STATUS_LABEL = {
@@ -23,6 +23,7 @@ export default function OrderDetailsPage({ loadOrderIntoCart }) {
   const navigate = useNavigate();
   const [order, setOrder] = useState(null);
   const [notFound, setNotFound] = useState(false);
+  const [sending, setSending] = useState(false);
 
   useEffect(() => {
     load();
@@ -37,6 +38,9 @@ export default function OrderDetailsPage({ loadOrderIntoCart }) {
           id: res.data._id,
           date: new Date(res.data.createdAt).toLocaleString(),
           items: res.data.items,
+          subtotal: res.data.subtotal,
+          discountCode: res.data.discountCode,
+          discountAmount: res.data.discountAmount,
           total: res.data.total,
           status: res.data.status,
         });
@@ -55,53 +59,48 @@ export default function OrderDetailsPage({ loadOrderIntoCart }) {
   if (notFound) return <h2 className="container section">Order not found</h2>;
   if (!order) return <div className="container section">Loading…</div>;
 
-  const total = () => order.total ?? order.items.reduce((s, p) => s + p.price * p.qty, 0);
+  const subtotal = () => order.subtotal ?? order.items.reduce((s, p) => s + p.price * p.qty, 0);
+  const total = () => order.total ?? subtotal();
 
-  const generatePdf = () => {
-    const doc = new jsPDF();
-    doc.setFontSize(16);
-    doc.text("DTComponents", 105, 15, { align: "center" });
-    doc.setFontSize(11);
-    doc.text("Bill of Quantities (BOQ)", 105, 22, { align: "center" });
-    doc.setFontSize(10);
-    doc.text(`Date: ${order.date}`, 14, 30);
-
-    let y = 40;
-    doc.text("S/N", 14, y);
-    doc.text("Description", 25, y);
-    doc.text("Qty", 130, y);
-    doc.text("Unit (₦)", 145, y);
-    doc.text("Amount (₦)", 170, y);
-
-    y += 6;
-    doc.line(14, y, 195, y);
-    y += 6;
-
-    order.items.forEach((item, index) => {
-      doc.text(String(index + 1), 14, y);
-      doc.text(item.title, 25, y);
-      doc.text(String(item.qty), 130, y);
-      doc.text(item.price.toLocaleString(), 145, y);
-      doc.text((item.qty * item.price).toLocaleString(), 170, y);
-      y += 7;
+  const generatePdf = async () => {
+    const contact = await fetchCustomerContact();
+    const doc = buildBoqPdf({
+      items: order.items,
+      subtotal: subtotal(),
+      discount: order.discountAmount > 0 ? { code: order.discountCode, amount: order.discountAmount } : null,
+      total: total(),
+      date: order.date,
+      orderId: order.id,
+      contact,
     });
-
-    y += 4;
-    doc.line(14, y, 195, y);
-    y += 8;
-    doc.setFontSize(11);
-    doc.text(`Grand Total: ₦${total().toLocaleString()}`, 195, y, { align: "right" });
-
     doc.save(`Order_${order.id}_BOQ.pdf`);
   };
 
-  const sendWhatsApp = () => {
-    let msg = `Hello DTComponents,%0A%0APlease find my BOQ attached.%0A%0AOrder Summary:%0A`;
-    order.items.forEach((p) => {
-      msg += `- ${p.qty} x ${p.title}%0A`;
-    });
-    msg += `%0AGrand Total: ₦${total().toLocaleString()}%0A%0AThank you.`;
-    window.open(`https://wa.me/${WHATSAPP_NUMBER}?text=${msg}`, "_blank");
+  const sendWhatsApp = async () => {
+    setSending(true);
+    try {
+      const contact = await fetchCustomerContact();
+      const doc = buildBoqPdf({
+        items: order.items,
+        subtotal: subtotal(),
+        discount: order.discountAmount > 0 ? { code: order.discountCode, amount: order.discountAmount } : null,
+        total: total(),
+        date: order.date,
+        orderId: order.id,
+        contact,
+      });
+
+      let msg = `Hello DTComponents,\n\nPlease find my BOQ attached (Order #${String(order.id).slice(-6)}).\n\nOrder Summary:\n`;
+      order.items.forEach((p) => {
+        msg += `- ${p.qty} x ${p.title}\n`;
+      });
+      if (order.discountAmount > 0) msg += `\nDiscount${order.discountCode ? ` (${order.discountCode})` : ""}: -₦${order.discountAmount.toLocaleString()}\n`;
+      msg += `\nGrand Total: ₦${total().toLocaleString()}\n\nThank you.`;
+
+      await sharePdfToWhatsApp({ doc, filename: `Order_${order.id}_BOQ.pdf`, message: msg, whatsappNumber: WHATSAPP_NUMBER });
+    } finally {
+      setSending(false);
+    }
   };
 
   return (
@@ -128,12 +127,24 @@ export default function OrderDetailsPage({ loadOrderIntoCart }) {
         </div>
       ))}
 
-      <h3 style={{ marginTop: "20px" }}>Grand total: ₦{total().toLocaleString()}</h3>
+      <div style={{ marginTop: "20px" }}>
+        {order.discountAmount > 0 && (
+          <>
+            <p style={{ margin: "2px 0" }}>Subtotal: ₦{subtotal().toLocaleString()}</p>
+            <p style={{ margin: "2px 0", color: "var(--signal-dark)" }}>
+              Discount{order.discountCode ? ` (${order.discountCode})` : ""}: −₦{order.discountAmount.toLocaleString()}
+            </p>
+          </>
+        )}
+        <h3 style={{ marginTop: "8px" }}>Grand total: ₦{total().toLocaleString()}</h3>
+      </div>
 
       <div style={{ display: "flex", gap: "10px", marginTop: "20px", flexWrap: "wrap" }}>
         <button className="btn btn-dark" onClick={() => loadOrderIntoCart(order.items)}>Reorder</button>
         <button className="btn btn-secondary" onClick={generatePdf}>Download BOQ</button>
-        <button className="btn btn-secondary" onClick={sendWhatsApp}>Send to WhatsApp</button>
+        <button className="btn btn-secondary" onClick={sendWhatsApp} disabled={sending}>
+          {sending ? "Preparing…" : "Send to WhatsApp"}
+        </button>
         <button className="btn btn-secondary" onClick={() => navigate("/orders")}>Back to history</button>
       </div>
     </div>

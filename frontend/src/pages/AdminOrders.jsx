@@ -86,6 +86,8 @@ function OrdersPanel() {
                 <th>Customer</th>
                 <th>Date</th>
                 <th>Items</th>
+                <th>Subtotal</th>
+                <th>Discount</th>
                 <th>Total</th>
                 <th>Status</th>
               </tr>
@@ -97,6 +99,16 @@ function OrdersPanel() {
                   <td>{o.customer?.email || "Guest"}</td>
                   <td>{new Date(o.createdAt).toLocaleDateString()}</td>
                   <td>{o.items.reduce((s, i) => s + i.qty, 0)} pcs</td>
+                  <td>₦{(o.subtotal ?? o.total).toLocaleString()}</td>
+                  <td>
+                    {o.discountAmount > 0 ? (
+                      <span style={{ color: "var(--signal-dark)" }}>
+                        −₦{o.discountAmount.toLocaleString()}{o.discountCode ? ` (${o.discountCode})` : ""}
+                      </span>
+                    ) : (
+                      <span style={{ color: "var(--text-muted)" }}>—</span>
+                    )}
+                  </td>
                   <td>₦{o.total.toLocaleString()}</td>
                   <td>
                     <select

@@ -79,4 +79,25 @@ router.get("/me", requireCustomer, async (req, res) => {
   res.json(customer);
 });
 
+// ---------------------------
+// Update profile — name, phone, delivery address. Email/password are
+// deliberately not editable here to keep this endpoint low-risk; that
+// belongs behind its own re-auth flow if added later.
+// ---------------------------
+router.put("/me", requireCustomer, async (req, res) => {
+  const { name, phone, address, city, state } = req.body || {};
+  const update = {};
+  if (name !== undefined) update.name = String(name).trim();
+  if (phone !== undefined) update.phone = String(phone).trim();
+  if (address !== undefined) update.address = String(address).trim();
+  if (city !== undefined) update.city = String(city).trim();
+  if (state !== undefined) update.state = String(state).trim();
+
+  const customer = await Customer.findByIdAndUpdate(req.customerId, update, {
+    new: true,
+  }).select("-passwordHash");
+  if (!customer) return res.status(404).json({ error: "Account not found" });
+  res.json(customer);
+});
+
 export default router;

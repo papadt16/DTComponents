@@ -14,8 +14,16 @@ const ProjectSchema = new mongoose.Schema({
   features: [String],
   components: [String],
   schematic: String,
+  image: String,
+  difficulty: String,
   code: String,
-  explanation: [String],
+  explanation: [
+    {
+      title: String,
+      text: mongoose.Schema.Types.Mixed, // string or array of strings
+      img: String,
+    },
+  ],
 });
 
 const Project = mongoose.model("Project", ProjectSchema, "projects");

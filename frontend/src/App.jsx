@@ -1,4 +1,4 @@
-import { Routes, Route, Link, useLocation, useNavigate } from "react-router-dom";
+import { Routes, Route, Link, useLocation } from "react-router-dom";
 import { useState, useEffect, lazy, Suspense } from "react";
 
 // Home loads eagerly since it's the entry point for most visitors — no
@@ -20,8 +20,9 @@ const OrderHistoryPage = lazy(() => import("./pages/OrderHistoryPage.jsx"));
 const OrderDetailsPage = lazy(() => import("./pages/OrderDetailsPage.jsx"));
 const AuthPage = lazy(() => import("./pages/AuthPage.jsx"));
 const WishlistPage = lazy(() => import("./pages/WishlistPage.jsx"));
+const ProfilePage = lazy(() => import("./pages/ProfilePage.jsx"));
 
-import { isLoggedIn, getCustomerProfile, clearCustomerSession } from "./utils/auth.js";
+import { isLoggedIn, getCustomerProfile } from "./utils/auth.js";
 
 // The admin URL itself is just a courtesy obscurity layer, configurable
 // via env so it isn't the same guessable "/admin" for every visitor.
@@ -33,7 +34,6 @@ export default function App() {
   const [cart, setCart] = useState([]);
   const [loggedIn, setLoggedIn] = useState(isLoggedIn());
   const location = useLocation();
-  const navigate = useNavigate();
 
   useEffect(() => {
     const storedCart = JSON.parse(localStorage.getItem("dt_cart") || "[]");
@@ -43,12 +43,6 @@ export default function App() {
   useEffect(() => {
     setLoggedIn(isLoggedIn());
   }, [location.pathname]);
-
-  function handleLogout() {
-    clearCustomerSession();
-    setLoggedIn(false);
-    navigate("/");
-  }
 
   const updateCart = (newCart) => {
     setCart(newCart);
@@ -78,9 +72,7 @@ export default function App() {
               {loggedIn ? (
                 <>
                   <Link to="/wishlist" className={`nav-link ${location.pathname === "/wishlist" ? "active" : ""}`}>Wishlist</Link>
-                  <button onClick={handleLogout} className="nav-link" style={{ background: "none", border: "none", padding: 0, fontFamily: "inherit" }}>
-                    Sign out
-                  </button>
+                  <Link to="/profile" className={`nav-link ${location.pathname === "/profile" ? "active" : ""}`}>Profile</Link>
                 </>
               ) : (
                 <Link to="/login" className={`nav-link ${location.pathname === "/login" ? "active" : ""}`}>Sign in</Link>
@@ -105,7 +97,8 @@ export default function App() {
           <Route path="/login" element={<AuthPage mode="login" />} />
           <Route path="/register" element={<AuthPage mode="register" />} />
           <Route path="/wishlist" element={<WishlistPage cart={cart} updateCart={updateCart} />} />
-          <Route path="/projects/:slug" element={<ProjectDetails />} />
+          <Route path="/profile" element={<ProfilePage />} />
+          <Route path="/projects/:slug" element={<ProjectDetails cart={cart} updateCart={updateCart} />} />
           <Route path={`${ADMIN_PATH}/projects`} element={<AdminProjects />} />
           <Route path={`${ADMIN_PATH}/orders`} element={<AdminOrders />} />
           <Route path={`${ADMIN_PATH}/promotions`} element={<AdminPromotions />} />
