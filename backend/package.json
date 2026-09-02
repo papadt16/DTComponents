@@ -24,5 +24,10 @@
   },
   "engines": {
     "node": "20.x"
+  },
+  "allowScripts": {
+    "bcrypt@5.1.1": true,
+    "core-js@3.50.0": true,
+    "mongodb-memory-server@11.2.0": true
   }
 }
