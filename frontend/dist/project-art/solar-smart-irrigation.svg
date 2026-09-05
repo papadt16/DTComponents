@@ -1,0 +1,44 @@
+<svg viewBox="0 0 400 200" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="400" y2="200" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#123a63"/>
+      <stop offset="1" stop-color="#060b14"/>
+    </linearGradient>
+    <pattern id="grid" width="24" height="24" patternUnits="userSpaceOnUse">
+      <path d="M24 0H0V24" fill="none" stroke="#ffffff" stroke-opacity="0.05" stroke-width="1"/>
+    </pattern>
+  </defs>
+  <rect width="400" height="200" fill="url(#bg)"/>
+  <rect width="400" height="200" fill="url(#grid)"/>
+  
+  <circle cx="90" cy="55" r="26" fill="#b8790a" opacity="0.9"/>
+  <g stroke="#b8790a" stroke-width="2" opacity="0.7">
+    <line x1="90" y1="15" x2="90" y2="24"/>
+    <line x1="130" y1="55" x2="139" y2="55"/>
+    <line x1="118" y1="27" x2="125" y2="20"/>
+    <line x1="118" y1="83" x2="125" y2="90"/>
+  </g>
+  <g transform="translate(300,45) rotate(20)">
+    <rect x="-30" y="-18" width="60" height="36" rx="3" fill="#17b3c9" opacity="0.85" stroke="#060b14" stroke-width="2"/>
+    <line x1="-15" y1="-18" x2="-15" y2="18" stroke="#060b14" stroke-width="1.5" opacity="0.5"/>
+    <line x1="0" y1="-18" x2="0" y2="18" stroke="#060b14" stroke-width="1.5" opacity="0.5"/>
+    <line x1="15" y1="-18" x2="15" y2="18" stroke="#060b14" stroke-width="1.5" opacity="0.5"/>
+  </g>
+  <g transform="translate(150,150)">
+    <path d="M0 -40 C-20 -20 -20 10 0 10 C20 10 20 -20 0 -40Z" fill="#f6f5f0" opacity="0.15"/>
+    <path d="M-30 10 Q-15 -30 0 -50 Q15 -30 30 10" fill="none" stroke="#f6f5f0" stroke-width="0"/>
+    <path d="M0 10 Q-25 5 -30 -25" stroke="#c97a3d" stroke-width="4" fill="none" stroke-linecap="round"/>
+    <path d="M0 10 Q25 0 28 -32" stroke="#c97a3d" stroke-width="4" fill="none" stroke-linecap="round"/>
+    <path d="M0 10 L0 -35" stroke="#a85f28" stroke-width="5" fill="none" stroke-linecap="round"/>
+    <rect x="-6" y="10" width="12" height="20" fill="#a85f28"/>
+  </g>
+  <g transform="translate(230,140)">
+    <path d="M0 -22 C10 -8 10 8 0 14 C-10 8 -10 -8 0 -22Z" fill="#17b3c9"/>
+  </g>
+  <g transform="translate(70,145)" stroke="#f6f5f0" stroke-width="2" opacity="0.6">
+    <line x1="0" y1="0" x2="0" y2="30"/>
+    <line x1="-6" y1="8" x2="6" y2="8"/>
+    <line x1="-6" y1="18" x2="6" y2="18"/>
+  </g>
+
+</svg>

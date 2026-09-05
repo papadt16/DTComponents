@@ -1,0 +1,36 @@
+<svg viewBox="0 0 400 200" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="400" y2="200" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#123a63"/>
+      <stop offset="1" stop-color="#060b14"/>
+    </linearGradient>
+    <pattern id="grid" width="24" height="24" patternUnits="userSpaceOnUse">
+      <path d="M24 0H0V24" fill="none" stroke="#ffffff" stroke-opacity="0.05" stroke-width="1"/>
+    </pattern>
+  </defs>
+  <rect width="400" height="200" fill="url(#bg)"/>
+  <rect width="400" height="200" fill="url(#grid)"/>
+  
+  <rect x="150" y="40" width="100" height="60" rx="8" fill="#060b14" stroke="#17b3c9" stroke-width="3"/>
+  <text x="200" y="80" text-anchor="middle" font-size="28" font-weight="700" fill="#17b3c9" font-family="monospace">A12</text>
+  <g fill="#c97a3d">
+    <circle cx="90" cy="140" r="12"/>
+    <rect x="78" y="152" width="24" height="30" rx="8"/>
+  </g>
+  <g fill="#c97a3d" opacity="0.75">
+    <circle cx="140" cy="145" r="11"/>
+    <rect x="129" y="156" width="22" height="27" rx="7"/>
+  </g>
+  <g fill="#c97a3d" opacity="0.5">
+    <circle cx="185" cy="148" r="10"/>
+    <rect x="175" y="158" width="20" height="24" rx="6"/>
+  </g>
+  <g stroke="#f6f5f0" stroke-width="2" opacity="0.4" stroke-dasharray="3 4">
+    <line x1="220" y1="165" x2="330" y2="165"/>
+  </g>
+  <g transform="translate(340,150)" fill="#f6f5f0" opacity="0.8">
+    <rect x="-10" y="-15" width="20" height="30" rx="3"/>
+    <circle cx="0" cy="-20" r="5"/>
+  </g>
+
+</svg>

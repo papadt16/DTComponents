@@ -1,0 +1,27 @@
+<svg viewBox="0 0 400 200" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="400" y2="200" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#123a63"/>
+      <stop offset="1" stop-color="#060b14"/>
+    </linearGradient>
+    <pattern id="grid" width="24" height="24" patternUnits="userSpaceOnUse">
+      <path d="M24 0H0V24" fill="none" stroke="#ffffff" stroke-opacity="0.05" stroke-width="1"/>
+    </pattern>
+  </defs>
+  <rect width="400" height="200" fill="url(#bg)"/>
+  <rect width="400" height="200" fill="url(#grid)"/>
+  
+  <path d="M20 165 Q120 90 200 165 T380 165" stroke="#f6f5f0" stroke-width="6" fill="none" opacity="0.55"/>
+  <g transform="translate(200,110)">
+    <rect x="-45" y="-20" width="90" height="40" rx="10" fill="#c97a3d" stroke="#a85f28" stroke-width="3"/>
+    <circle cx="-40" cy="22" r="14" fill="#060b14" stroke="#f6f5f0" stroke-width="2"/>
+    <circle cx="40" cy="22" r="14" fill="#060b14" stroke="#f6f5f0" stroke-width="2"/>
+    <circle cx="0" cy="-30" r="8" fill="#060b14" stroke="#17b3c9" stroke-width="2"/>
+    <g fill="#17b3c9">
+      <circle cx="-18" cy="18" r="3.5"/>
+      <circle cx="0" cy="20" r="3.5"/>
+      <circle cx="18" cy="18" r="3.5"/>
+    </g>
+  </g>
+
+</svg>

@@ -64,7 +64,7 @@ export default function ProductDetails({ cart = [], updateCart }) {
 
   return (
     <div className="container section">
-      <div style={pdGrid}>
+      <div className="product-detail-grid">
         <div className="product-card-img-wrap" style={{ height: "360px" }}>
           <img src={product.img} alt={product.title} className="product-card-img" style={{ maxHeight: "320px" }} />
         </div>
@@ -150,12 +150,6 @@ function Section({ title, children }) {
     </div>
   );
 }
-
-const pdGrid = {
-  display: "grid",
-  gridTemplateColumns: "1fr 1fr",
-  gap: "40px",
-};
 
 const qtyBox = {
   display: "flex",

@@ -12,6 +12,12 @@ function stockInfo(stock) {
   return { label: "In stock", cls: "in" };
 }
 
+const MOBILE_BREAKPOINT = 720;
+
+function isMobileViewport() {
+  return typeof window !== "undefined" && window.innerWidth <= MOBILE_BREAKPOINT;
+}
+
 export default function Shop({ cart, updateCart }) {
   const [products, setProducts] = useState([]);
   const [categories, setCategories] = useState([]);
@@ -22,7 +28,11 @@ export default function Shop({ cart, updateCart }) {
   const [search, setSearch] = useState(searchParams.get("search") || "");
   const [category, setCategory] = useState(searchParams.get("category") || "All");
   const [toast, setToast] = useState("");
-  const [sidebarOpen, setSidebarOpen] = useState(true);
+  // Sidebar starts open on desktop (docked panel, part of the layout) but
+  // closed on mobile (where it becomes a full-height drawer over the
+  // content) — defaulting it open on mobile would mean every phone
+  // visitor lands on a screen fully covered by the category drawer.
+  const [sidebarOpen, setSidebarOpen] = useState(() => !isMobileViewport());
 
   async function loadProducts() {
     setLoading(true);
@@ -104,6 +114,14 @@ export default function Shop({ cart, updateCart }) {
     });
   }
 
+  function selectCategory(c) {
+    setCategory(c);
+    // On mobile the sidebar is a full-screen drawer sitting over the
+    // content — close it once a choice is made so the person can
+    // actually see the filtered results without an extra tap.
+    if (isMobileViewport()) setSidebarOpen(false);
+  }
+
   function showToast(message) {
     setToast(message);
     setTimeout(() => setToast(""), 2500);
@@ -126,12 +144,13 @@ export default function Shop({ cart, updateCart }) {
       </button>
 
       <div className="shop-layout">
+        {sidebarOpen && <div className="shop-sidebar-backdrop" onClick={() => setSidebarOpen(false)} />}
         <aside className={`shop-sidebar ${sidebarOpen ? "" : "collapsed"}`}>
           {allCategories.map((c) => (
             <button
               key={c}
               className={`shop-sidebar-pill ${category === c ? "active" : ""}`}
-              onClick={() => setCategory(c)}
+              onClick={() => selectCategory(c)}
             >
               {c}
             </button>

@@ -33,6 +33,7 @@ const ADMIN_PATH = import.meta.env.VITE_ADMIN_PATH || "/admin";
 export default function App() {
   const [cart, setCart] = useState([]);
   const [loggedIn, setLoggedIn] = useState(isLoggedIn());
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const location = useLocation();
 
   useEffect(() => {
@@ -42,6 +43,7 @@ export default function App() {
 
   useEffect(() => {
     setLoggedIn(isLoggedIn());
+    setMobileMenuOpen(false); // close the drawer on every navigation
   }, [location.pathname]);
 
   const updateCart = (newCart) => {
@@ -65,7 +67,16 @@ export default function App() {
               <span className="brand-mark" />
               DTComponents
             </Link>
-            <div className="nav-links">
+
+            <button
+              className="nav-hamburger"
+              aria-label={mobileMenuOpen ? "Close menu" : "Open menu"}
+              onClick={() => setMobileMenuOpen((v) => !v)}
+            >
+              <span className="hamburger-icon"><span /><span /><span /></span>
+            </button>
+
+            <div className={`nav-links ${mobileMenuOpen ? "open" : ""}`}>
               <Link to="/" className={`nav-link ${location.pathname === "/" ? "active" : ""}`}>Home</Link>
               <Link to="/shop" className={`nav-link ${location.pathname === "/shop" ? "active" : ""}`}>Shop</Link>
               <Link to="/orders" className={`nav-link ${location.pathname === "/orders" ? "active" : ""}`}>Orders</Link>
@@ -83,6 +94,8 @@ export default function App() {
               </Link>
             </div>
           </div>
+
+          {mobileMenuOpen && <div className="nav-backdrop" onClick={() => setMobileMenuOpen(false)} />}
         </nav>
       )}
 

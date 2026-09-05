@@ -1,0 +1,36 @@
+<svg viewBox="0 0 400 200" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="400" y2="200" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#123a63"/>
+      <stop offset="1" stop-color="#060b14"/>
+    </linearGradient>
+    <pattern id="grid" width="24" height="24" patternUnits="userSpaceOnUse">
+      <path d="M24 0H0V24" fill="none" stroke="#ffffff" stroke-opacity="0.05" stroke-width="1"/>
+    </pattern>
+  </defs>
+  <rect width="400" height="200" fill="url(#bg)"/>
+  <rect width="400" height="200" fill="url(#grid)"/>
+  
+  <circle cx="260" cy="55" r="28" fill="#b8790a" opacity="0.9"/>
+  <g stroke="#b8790a" stroke-width="2" opacity="0.7">
+    <line x1="260" y1="10" x2="260" y2="20"/>
+    <line x1="305" y1="55" x2="315" y2="55"/>
+    <line x1="292" y1="22" x2="299" y2="15"/>
+  </g>
+  <g transform="translate(150,80)">
+    <ellipse cx="0" cy="30" rx="55" ry="26" fill="#f6f5f0" opacity="0.92"/>
+    <ellipse cx="-35" cy="20" rx="30" ry="22" fill="#f6f5f0" opacity="0.92"/>
+    <ellipse cx="35" cy="18" rx="34" ry="24" fill="#f6f5f0" opacity="0.92"/>
+  </g>
+  <g transform="translate(80,90)">
+    <rect x="-6" y="0" width="12" height="55" rx="6" fill="#f6f5f0" stroke="#c97a3d" stroke-width="2"/>
+    <circle cx="0" cy="62" r="12" fill="#c97a3d"/>
+    <rect x="-3" y="15" width="6" height="42" fill="#c97a3d"/>
+  </g>
+  <g transform="translate(330,110)">
+    <line x1="0" y1="0" x2="0" y2="50" stroke="#17b3c9" stroke-width="3"/>
+    <path d="M-14 10 A18 18 0 0 1 14 10" stroke="#17b3c9" stroke-width="2" fill="none" opacity="0.7"/>
+    <path d="M-8 18 A10 10 0 0 1 8 18" stroke="#17b3c9" stroke-width="2" fill="none" opacity="0.9"/>
+  </g>
+
+</svg>
